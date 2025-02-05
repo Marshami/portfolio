@@ -17,5 +17,28 @@
     </nav>
 
     <h1>Contact</h1>
+
+    <!-- The form element -->
+    <form action="mailto:dan023@ucsd.edu" method="POST" enctype="text/plain">
+    
+    <!-- Email field -->
+    <label for="email">Email:</label>
+    <input type="email" name="email" id="email" />
+    <br><br>
+    
+    <!-- Subject field -->
+    <label for="subject">Subject:</label>
+    <input type="text" name="subject" id="subject" />
+    <br><br>
+    
+    <!-- Message body field -->
+    <label for="body">Message:</label>
+    <br>
+    <textarea name="body" id="body" rows="5" cols="30"></textarea>
+    <br><br>
+    
+    <!-- Submit button -->
+    <button type="submit">Send</button>
+  </form>
 </body>
 </html>
