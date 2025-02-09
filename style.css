@@ -12,5 +12,115 @@ nav ul {
     padding: 0;       /* Removes default padding */
     margin: 0;        /* Removes default margin */
     display: flex;    /* Enables Flexbox */
+    gap: 1.5em; /* Adds spacing between links */
   }
+
+  nav {
+    display: flex; /* Enables Flexbox */
+    justify-content: center; /* Centers items horizontally */
+    background-color: #333; /* Dark background */
+    padding: 1em 0; /* Adds spacing */
+  }
+  
+  nav li {
+    margin: 0;
+  }
+  
+  nav a {
+    text-decoration: none;
+    color: white;
+    padding: 0.5em 1em;
+    font-size: 1.2em;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+
+  nav a:hover {
+    background-color: #555; /* Slightly lighter on hover */
+  }
+  
+  nav a.current {
+    border-bottom: 4px solid #ffcc00; /* Highlight current page */
+  }
+
+  form {
+    font: inherit; /* Makes the form match the page’s font */
+    display: grid;
+    grid-template-columns: auto 1fr; /* First column auto-sized, second column takes remaining space */
+    gap: 1em; /* Adds spacing between rows */
+    max-width: 600px; /* Limits form width */
+    margin: auto; /* Centers the form */
+  }
+
+  form label {
+    display: block; /* Makes labels appear above inputs */
+    font-weight: bold;
+    margin-bottom: 0.5em; /* Adds spacing below labels */
+    grid-column: 1 / 2; /* Places label in the first column */
+    text-align: right; /* Right-aligns labels */
+    padding-right: 1em; /* Adds spacing between label and input */
+  }
+  
+  form input,
+  form textarea {
+    width: 100%; /* Makes inputs and textareas take full width */
+    padding: 0.5em;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box; /* Ensures padding is included in width */
+    grid-column: 2 / 3; /* Places input in the second column */
+  }
+  
+  form button {
+    display: block;
+    width: 100%;
+    padding: 0.7em;
+    background-color: #007bff; /* Blue button */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    grid-column: 1 / -1; /* Makes button span across both columns */
+  }
+  
+  form button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+  }
+
+  .projects {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(15em, 1fr)); /* Responsive columns */
+    gap: 1em; /* Adds spacing */
+    padding: 1em;
+  }
+
+  .projects article {
+    display: grid;
+    grid-template-rows: subgrid;
+    grid-row: span 3;
+    padding: 1em;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .projects img {
+    max-width: 100%;
+    border-radius: 8px;
+  }
+  
+  .projects h2 {
+    font-size: 1.5em;
+    margin: 0.5em 0;
+  }
+  
+  .projects p {
+    font-size: 1em;
+    color: #666;
+  }
+
+
   
