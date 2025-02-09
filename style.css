@@ -6,3 +6,11 @@ body {
     margin-inline: max(1em, (100% - 100ch) / 2);
     padding: 1em;
 }
+
+nav ul {
+    list-style: none; /* Removes bullets */
+    padding: 0;       /* Removes default padding */
+    margin: 0;        /* Removes default margin */
+    display: flex;    /* Enables Flexbox */
+  }
+  
