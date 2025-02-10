@@ -53,6 +53,38 @@ const pages = [
     nav.appendChild(link);
   }
   
-  // Insert the navigation at the top of the <body>
-  document.body.prepend(nav);
+// Insert the navigation at the top of the <body>
+document.body.prepend(nav);
   
+// Insert dark mode switch into the page
+document.body.insertAdjacentHTML(
+    "afterbegin",
+    `
+    <label class="color-scheme">
+      Theme:
+      <select id="theme-switch">
+        <option value="auto">Automatic</option>
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
+      </select>
+    </label>
+    `
+  );
+  
+  const themeSwitch = document.getElementById("theme-switch");
+  
+  // Function to update the theme
+  function setTheme(mode) {
+    document.documentElement.style.setProperty("color-scheme", mode);
+    localStorage.setItem("theme", mode); // Save user preference
+  }
+  
+  // Load saved theme from localStorage (if exists)
+  const savedTheme = localStorage.getItem("theme") || "auto";
+  setTheme(savedTheme); // Apply saved theme
+  themeSwitch.value = savedTheme; // Update dropdown to match
+  
+  // Event listener for theme selection
+  themeSwitch.addEventListener("input", function (event) {
+    setTheme(event.target.value);
+  });
