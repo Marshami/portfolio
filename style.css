@@ -38,9 +38,11 @@ nav ul {
   nav a:hover {
     background-color: #555; /* Slightly lighter on hover */
   }
-  
+
   nav a.current {
-    border-bottom: 4px solid #ffcc00; /* Highlight current page */
+    font-weight: bold;
+    color: #ffcc00;
+    border-bottom: 3px solid #ffcc00;
   }
 
   form {
@@ -120,12 +122,6 @@ nav ul {
   .projects p {
     font-size: 1em;
     color: #666;
-  }
-
-  nav a.current {
-    font-weight: bold;
-    color: #ffcc00; /* Change color to yellow */
-    border-bottom: 3px solid #ffcc00; /* Add an underline */
   }
 
 
