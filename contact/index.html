@@ -10,27 +10,51 @@
     <h1>Contact</h1>
 
     <!-- The form element -->
-    <form action="mailto:dan023@ucsd.edu" method="POST" enctype="text/plain">
+    <form id="contact-form">
+        <!-- Email field -->
+        <label for="email">Your Email:</label>
+        <input type="email" name="email" id="email" required />
+        <br><br>
     
-    <!-- Email field -->
-    <label for="email">Email:</label>
-    <input type="email" name="email" id="email" />
-    <br><br>
+        <!-- Subject field -->
+        <label for="subject">Subject:</label>
+        <input type="text" name="subject" id="subject" required />
+        <br><br>
     
-    <!-- Subject field -->
-    <label for="subject">Subject:</label>
-    <input type="text" name="subject" id="subject" />
-    <br><br>
+        <!-- Message body field -->
+        <label for="body">Message:</label>
+        <br>
+        <textarea name="body" id="body" rows="5" cols="30" required></textarea>
+        <br><br>
     
-    <!-- Message body field -->
-    <label for="body">Message:</label>
-    <br>
-    <textarea name="body" id="body" rows="5" cols="30"></textarea>
-    <br><br>
+        <!-- Submit button -->
+        <button type="submit">Send</button>
+    </form>
     
-    <!-- Submit button -->
-    <button type="submit">Send</button>
-  </form>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("contact-form");
+    
+        form.addEventListener("submit", function (event) {
+            event.preventDefault(); // Prevent default form submission
+    
+            // Get form values
+            const email = document.getElementById("email").value;
+            const subject = document.getElementById("subject").value;
+            const body = document.getElementById("body").value;
+    
+            // Encode values properly to avoid formatting issues
+            const encodedSubject = encodeURIComponent(subject);
+            const encodedBody = encodeURIComponent(body);
+    
+            // Construct mailto link with encoded data
+            const mailtoLink = `mailto:dan023@ucsd.edu?subject=${encodedSubject}&body=${encodedBody}`;
+    
+            // Open user's email client with pre-filled details
+            window.location.href = mailtoLink;
+        });
+    });
+    </script>
 
   <script src="../global.js" type="module"></script>
 
