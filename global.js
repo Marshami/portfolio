@@ -19,10 +19,10 @@ if (currentLink) {
 
 // Define the site pages
 const pages = [
-    { url: "portfolio/index.html", title: "Home" },
-    { url: "portfolio/projects/index.html", title: "Projects" },
-    { url: "portfolio/contact/index.html", title: "Contact" },
-    { url: "portfolio/cv/index.html", title: "Resume" },
+    { url: "https://marshami.github.io/portfolio/index.html", title: "Home" },
+    { url: "https://marshami.github.io/portfolio/projects/index.html", title: "Projects" },
+    { url: "https://marshami.github.io/portfolio/contact/index.html", title: "Contact" },
+    { url: "https://marshami.github.io/portfolio/cv/index.html", title: "Resume" },
     { url: "https://github.com/Marshami", title: "Profile" } // Example external link
   ];
   
