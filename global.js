@@ -17,13 +17,13 @@ if (currentLink) {
   currentLink.classList.add("current");
 }
 
-// Define the site pages
+// Define site pages
 const pages = [
     { url: "/portfolio/index.html", title: "Home" },
     { url: "/portfolio/projects/index.html", title: "Projects" },
     { url: "/portfolio/contact/index.html", title: "Contact" },
     { url: "/portfolio/cv/index.html", title: "Resume" },
-    { url: "https://github.com/Marshami", title: "Profile" } // External link
+    { url: "https://github.com/Marshami", title: "Profile" }
 ];
 
 // Create the <nav> element
@@ -31,6 +31,7 @@ const nav = document.createElement("nav");
 
 // Get current page path
 const currentPath = window.location.pathname;
+console.log("Current Path:", currentPath); // Debugging
 
 // Loop through pages and create links
 for (let p of pages) {
@@ -38,8 +39,14 @@ for (let p of pages) {
     link.href = p.url;
     link.textContent = p.title;
 
-    // Highlight the current page (compare only pathname)
-    if (currentPath.endsWith(p.url)) {
+    console.log("Checking against:", p.url); // Debugging
+
+    // Highlight current page correctly (handles missing index.html)
+    if (
+        currentPath.endsWith(p.url) || 
+        (p.url.endsWith("index.html") && currentPath.endsWith(p.url.replace("index.html", "")))
+    ) {
+        console.log("Match found! Highlighting:", p.title); // Debugging
         link.classList.add("current");
     }
 
@@ -53,7 +60,7 @@ for (let p of pages) {
 
 // Insert the navigation at the top of the <body>
 document.body.prepend(nav);
-  
+
 // Insert dark mode switch into the page
 document.body.insertAdjacentHTML(
     "afterbegin",
