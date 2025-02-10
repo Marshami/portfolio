@@ -88,3 +88,8 @@ document.body.insertAdjacentHTML(
   themeSwitch.addEventListener("input", function (event) {
     setTheme(event.target.value);
   });
+
+// Check if nav already exists to avoid duplication
+if (!document.querySelector("nav")) {
+    document.body.prepend(nav);
+}
