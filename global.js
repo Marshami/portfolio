@@ -93,3 +93,27 @@ document.body.insertAdjacentHTML(
 if (!document.querySelector("nav")) {
     document.body.prepend(nav);
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("contact-form");
+  
+    if (form) {
+      form.addEventListener("submit", function (event) {
+        event.preventDefault(); // Prevents default form submission
+  
+        // Collect form data
+        const formData = new FormData(form);
+        const params = new URLSearchParams();
+  
+        for (let [key, value] of formData) {
+          params.append(key, encodeURIComponent(value));
+        }
+  
+        // Create the mailto link
+        const mailtoLink = `mailto:your-email@example.com?subject=Contact Form Submission&body=${params}`;
+  
+        // Open the user's email client with formatted data
+        window.location.href = mailtoLink;
+      });
+    }
+  });
