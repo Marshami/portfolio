@@ -23,7 +23,7 @@ const pages = [
     { url: "projects/index.html", title: "Projects" },
     { url: "contact/index.html", title: "Contact" },
     { url: "cv/index.html", title: "Resume" }
-    {url: "https://github.com/marshami", title: "Profile" } // Example external link
+    { url: "https://github.com/marshami", title: "Profile" } // Example external link
   ];
   
   // Create the <nav> element
