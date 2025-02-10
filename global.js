@@ -23,15 +23,15 @@ const pages = [
     { url: "/portfolio/projects/index.html", title: "Projects" },
     { url: "/portfolio/contact/index.html", title: "Contact" },
     { url: "/portfolio/cv/index.html", title: "Resume" },
-    { url: "https://github.com/Marshami", title: "Profile" }
+    { url: "https://github.com/Marshami", title: "Profile" } // External link
 ];
 
 // Create the <nav> element
 const nav = document.createElement("nav");
 
-// Get current page path
+// Get the current page path
 const currentPath = window.location.pathname;
-console.log("Current Path:", currentPath); // Debugging
+console.log("DEBUG: Current Page Path:", currentPath); // Debugging
 
 // Loop through pages and create links
 for (let p of pages) {
@@ -39,14 +39,14 @@ for (let p of pages) {
     link.href = p.url;
     link.textContent = p.title;
 
-    console.log("Checking against:", p.url); // Debugging
+    console.log(`DEBUG: Comparing Current Path: ${currentPath} with ${p.url}`);
 
-    // Highlight current page correctly (handles missing index.html)
+    // Highlight the current page correctly (handles missing index.html)
     if (
-        currentPath.endsWith(p.url) || 
-        (p.url.endsWith("index.html") && currentPath.endsWith(p.url.replace("index.html", "")))
+        currentPath === p.url || 
+        currentPath.endsWith(p.url.replace("index.html", ""))
     ) {
-        console.log("Match found! Highlighting:", p.title); // Debugging
+        console.log(`Match found! Highlighting ${p.title}`);
         link.classList.add("current");
     }
 
