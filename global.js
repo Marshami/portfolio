@@ -22,8 +22,8 @@ const pages = [
     { url: "index.html", title: "Home" },
     { url: "projects/index.html", title: "Projects" },
     { url: "contact/index.html", title: "Contact" },
-    { url: "cv/index.html", title: "Resume" }
-    { url: "https://github.com/marshami", title: "Profile" } // Example external link
+    { url: "cv/index.html", title: "Resume" },
+    { url: "https://github.com/Marshami", title: "Profile" } // Example external link
   ];
   
   // Create the <nav> element
