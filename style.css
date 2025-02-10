@@ -122,5 +122,11 @@ nav ul {
     color: #666;
   }
 
+  nav a.current {
+    font-weight: bold;
+    color: #ffcc00; /* Change color to yellow */
+    border-bottom: 3px solid #ffcc00; /* Add an underline */
+  }
+
 
   
