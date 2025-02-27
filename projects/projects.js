@@ -62,17 +62,14 @@ function renderPieChart(projects) {
         label: year
     }));
 
-    // Create a persistent color scale based on each year
-    let allYears = [...new Set(allProjects.map(project => project.year))]; // Get unique years from all data
-    let colorScale = d3.scaleOrdinal(d3.schemeTableau10)
-        .domain(allYears); // Ensures consistent colors even after filtering
+    // ✅ Ensure all years remain in color mapping even after filtering
+    let allYears = [...new Set(allProjects.map(project => project.year))]; 
+    let colorScale = d3.scaleOrdinal(d3.schemeTableau10).domain(allYears);
 
     let pieGenerator = d3.pie().value(d => d.value);
     let arcData = pieGenerator(data);
 
-    let arcGenerator = d3.arc()
-        .innerRadius(0)
-        .outerRadius(80);
+    let arcGenerator = d3.arc().innerRadius(0).outerRadius(80);
 
     let svg = d3.select('#projects-pie-plot');
     svg.selectAll('*').remove(); // Clear old chart
@@ -84,14 +81,14 @@ function renderPieChart(projects) {
         .attr('fill', d => colorScale(d.data.label))
         .attr('stroke', '#fff')
         .attr('stroke-width', 2)
-        .style('opacity', d => (selectedYear && d.data.label !== selectedYear) ? 0.4 : 1) // ✅ Desaturate non-selected
+        .style('opacity', d => (selectedYear && d.data.label !== selectedYear) ? 0.4 : 1) // ✅ Desaturate unselected slices
         .on('click', (event, d) => {
             console.log("🔄 Pie Slice Clicked:", d.data.label);
             selectedYear = (selectedYear === d.data.label) ? null : d.data.label;
             filterProjects();
         })
         .on('mouseover', function (event, d) {
-            paths.style('opacity', p => (p.data.label !== d.data.label) ? 0.4 : 1); // ✅ Desaturate on hover
+            paths.style('opacity', p => (p.data.label !== d.data.label) ? 0.4 : 1); // ✅ Hover desaturates other slices
         })
         .on('mouseout', function () {
             paths.style('opacity', d => (selectedYear && d.data.label !== selectedYear) ? 0.4 : 1); // ✅ Restore selection filter
@@ -146,7 +143,7 @@ function filterProjects() {
     console.log("✅ Filtered Projects:", filteredProjects);
 
     renderProjects(filteredProjects, document.querySelector('.projects'), 'h2');
-    renderPieChart(filteredProjects);
+    renderPieChart(allProjects); // ✅ Pass allProjects to keep all slices but desaturate unselected ones
 }
 
 // ====================
