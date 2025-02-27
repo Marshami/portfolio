@@ -194,23 +194,30 @@ form button:hover {
       color: #ffffff;
   }
 
-  /* Ensure white boxes keep black text */
+  /* Ensure white boxes stay white with black text */
   .projects article,
   #profile-stats {
       background-color: #ffffff !important;
       color: #000000 !important;
   }
 
-  .projects article * {
-      color: #000000 !important; /* Force all text elements inside to stay black */
-  }
-
-  #profile-stats * {
+  /* Target ALL text inside these sections */
+  .projects article h2,
+  .projects article p,
+  .projects article span,
+  .projects article a,
+  .projects article strong,
+  .projects article em,
+  #profile-stats h2,
+  #profile-stats p,
+  #profile-stats span,
+  #profile-stats dt,
+  #profile-stats dd {
       color: #000000 !important;
   }
 }
 
-/* Ensure manual dark mode also applies */
+/* Ensure manual dark mode applies correctly */
 .dark-mode {
   background-color: #121212;
   color: #ffffff;
@@ -222,7 +229,17 @@ form button:hover {
   color: #000000 !important;
 }
 
-.dark-mode .projects article *,
-.dark-mode #profile-stats * {
-  color: #000000 !important; /* Make all text inside stay black */
+/* FORCE all text inside white containers to be black */
+.dark-mode .projects article h2,
+.dark-mode .projects article p,
+.dark-mode .projects article span,
+.dark-mode .projects article a,
+.dark-mode .projects article strong,
+.dark-mode .projects article em,
+.dark-mode #profile-stats h2,
+.dark-mode #profile-stats p,
+.dark-mode #profile-stats span,
+.dark-mode #profile-stats dt,
+.dark-mode #profile-stats dd {
+  color: #000000 !important;
 }
