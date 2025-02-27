@@ -6,29 +6,36 @@ console.log("✅ D3 script is running...");
 let data = [];
 
 // ====================
-// 🚀 Load Data (loc.csv)
+// 🚀 Load Data from `meta/loc.csv`
 // ====================
 async function loadData() {
     data = await d3.csv('loc.csv', (row) => ({
         commit: row.commit,
         author: row.author,
-        // Combine date & timezone to get a local date object
-        date: new Date(row.date + 'T00:00' + row.timezone),
-        // Full datetime object
+        date: new Date(row.date),  // Convert to JS date object
         datetime: new Date(row.datetime),
-        line: +row.line,       // # of lines in this row
-        depth: +row.depth,     // Nesting depth in code
-        length: +row.length,   // Length of that line
+        line: +row.line,           // Convert to number
+        depth: +row.depth,
+        length: +row.length
     }));
 
     console.log("✅ Loaded Data:", data);
 
-    // 1) Display summary stats (commits, lines, file length, etc.)
+    if (data.length === 0) {
+        console.error("❌ No data available for visualization!");
+        return;
+    }
+
+    // Display Summary Stats
     displayStats();
 
-    // 2) Create scatterplot (commits by time of day)
+    // Create Scatterplot
     createScatterplot();
 }
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadData();
+});
 
 // ====================
 // 🚀 Display Summary Stats
@@ -58,100 +65,27 @@ function displayStats() {
 // 🚀 Create Scatterplot
 // ====================
 function createScatterplot() {
-    const width = 1000, height = 600;
+    console.log("🔄 Creating Scatterplot...");
 
-    // 1) Create SVG
+    if (data.length === 0) {
+        console.error("❌ No data available for scatterplot!");
+        return;
+    }
+
+    const width = 1000, height = 600;
+    const margin = { top: 50, right: 50, bottom: 50, left: 80 };
+
+    // Create SVG
     const svg = d3.select("#chart")
         .append("svg")
-        .attr("viewBox", `0 0 ${width} ${height}`)
-        .style("overflow", "visible");
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-    // 2) Define Scales
-    const xScale = d3.scaleTime()
-        .domain(d3.extent(data, d => d.datetime))
-        .range([0, width]);
+    console.log("✅ SVG Created");
 
-    // Y axis is 0–24 hours
-    const yScale = d3.scaleLinear()
-        .domain([0, 24])
-        .range([height, 0]);
-
-    // Radius scale based on # lines in each commit
-    const [minLine, maxLine] = d3.extent(data, d => d.line);
-    const rScale = d3.scaleSqrt()
-        .domain([minLine, maxLine])
-        .range([2, 30]); // Adjust max radius as needed
-
-    // 3) Add Axes
-    svg.append("g")
-       .attr("transform", `translate(0, ${height})`)
-       .call(d3.axisBottom(xScale));
-
-    svg.append("g")
-       .call(d3.axisLeft(yScale).tickFormat(d => `${d}:00`));
-
-    // 4) Plot Circles
-    const dots = svg.append("g").attr("class", "dots");
-    dots.selectAll("circle")
-        .data(data)
-        .join("circle")
-        .attr("cx", d => xScale(d.datetime))
-        .attr("cy", d => yScale(d.datetime.getHours()))
-        .attr("r", d => rScale(d.line))
-        .attr("fill", "steelblue")
-        .attr("fill-opacity", 0.7)
-        .on("mouseenter", (event, d) => {
-            updateTooltipContent(d);
-            d3.select("#commit-tooltip").attr("hidden", null);
-            // Make hovered dot fully opaque
-            d3.select(event.currentTarget).attr("fill-opacity", 1);
-        })
-        .on("mousemove", (event) => {
-            // Move tooltip with mouse
-            d3.select("#commit-tooltip")
-              .style("left", event.pageX + "px")
-              .style("top", event.pageY + "px");
-        })
-        .on("mouseleave", (event) => {
-            d3.select("#commit-tooltip").attr("hidden", true);
-            d3.select(event.currentTarget).attr("fill-opacity", 0.7);
-        });
-
-    // 5) Brush for selecting commits
-    const brush = d3.brush()
-        .on("start brush end", (event) => {
-            // event.selection = [[x0, y0], [x1, y1]]
-            if (!event.selection) return; // no selection
-            const [[x0, y0], [x1, y1]] = event.selection;
-            
-            // Filter data within the brush
-            const selectedData = data.filter(d => {
-                const cx = xScale(d.datetime);
-                const cy = yScale(d.datetime.getHours());
-                return (cx >= x0 && cx <= x1 && cy >= y0 && cy <= y1);
-            });
-
-            console.log("Selected commits:", selectedData);
-        });
-
-    // Place the brush below the dots so tooltips still work
-    const brushGroup = svg.append("g").call(brush);
-    // Raise the dots above the brush overlay
-    dots.raise();
-
-    console.log("✅ Scatter Plot Created");
-}
-
-function createScatterplot() {
-    const width = 1000, height = 600;
-
-    // 1) Create SVG
-    const svg = d3.select("#chart")
-        .append("svg")
-        .attr("viewBox", `0 0 ${width} ${height}`)
-        .style("overflow", "visible");
-
-    // 2) Define Scales
+    // Define Scales
     const xScale = d3.scaleTime()
         .domain(d3.extent(data, d => d.datetime))
         .range([0, width]);
@@ -162,9 +96,9 @@ function createScatterplot() {
 
     const rScale = d3.scaleSqrt()
         .domain(d3.extent(data, d => d.line))
-        .range([2, 30]);
+        .range([2, 30]); // Adjust max radius as needed
 
-    // 3) Add Axes
+    // Add Axes
     svg.append("g")
        .attr("transform", `translate(0, ${height})`)
        .call(d3.axisBottom(xScale));
@@ -172,17 +106,20 @@ function createScatterplot() {
     svg.append("g")
        .call(d3.axisLeft(yScale).tickFormat(d => `${d}:00`));
 
-    // 4) Tooltip Setup
-    const tooltip = d3.select("#commit-tooltip")
+    console.log("✅ Scales & Axes Added");
+
+    // Create Tooltip
+    const tooltip = d3.select("body").append("div")
+        .attr("id", "commit-tooltip")
         .style("position", "absolute")
-        .style("pointer-events", "none")
+        .style("visibility", "hidden")
         .style("background", "#fff")
         .style("border", "1px solid #ccc")
         .style("padding", "8px")
         .style("border-radius", "5px")
         .style("box-shadow", "2px 2px 10px rgba(0,0,0,0.2)");
 
-    // 5) Plot Circles
+    // Plot Circles
     const dots = svg.append("g").attr("class", "dots");
     dots.selectAll("circle")
         .data(data)
@@ -195,7 +132,6 @@ function createScatterplot() {
         .on("mouseenter", function (event, d) {
             updateTooltipContent(d);
             tooltip.style("visibility", "visible");
-
             d3.select(this).attr("fill-opacity", 1);
         })
         .on("mousemove", function (event) {
@@ -204,23 +140,17 @@ function createScatterplot() {
             let x = event.pageX + 10;
             let y = event.pageY - tooltipHeight - 10;
 
-            // Prevent tooltip from going out of bounds
-            if (x + tooltipWidth > window.innerWidth) {
-                x = event.pageX - tooltipWidth - 10;
-            }
-            if (y < 0) {
-                y = event.pageY + 10;
-            }
+            if (x + tooltipWidth > window.innerWidth) x = event.pageX - tooltipWidth - 10;
+            if (y < 0) y = event.pageY + 10;
 
-            tooltip.style("left", `${x}px`)
-                   .style("top", `${y}px`);
+            tooltip.style("left", `${x}px`).style("top", `${y}px`);
         })
         .on("mouseleave", function () {
             tooltip.style("visibility", "hidden");
             d3.select(this).attr("fill-opacity", 0.7);
         });
 
-    // 6) Brush for selecting commits
+    // Brush for selecting commits
     const brush = d3.brush()
         .on("start brush end", (event) => {
             if (!event.selection) return;
@@ -238,21 +168,21 @@ function createScatterplot() {
     const brushGroup = svg.append("g").call(brush);
     dots.raise();
 
-    console.log("✅ Scatter Plot Created");
+    console.log("✅ Scatter Plot Created with", data.length, "points");
 }
 
 // ====================
 // 🚀 Tooltip Content
 // ====================
 function updateTooltipContent(commit) {
-    d3.select("#commit-link")
-      .attr("href", `https://github.com/YOUR_REPO/commit/${commit.commit}`)
-      .text(commit.commit);
-
-    d3.select("#commit-date").text(commit.date.toDateString());
-    d3.select("#commit-time").text(commit.datetime.toLocaleTimeString());
-    d3.select("#commit-author").text(commit.author);
-    d3.select("#commit-lines").text(commit.line);
+    d3.select("#commit-tooltip")
+        .html(`
+            <strong>Commit:</strong> <a href="https://github.com/YOUR_REPO/commit/${commit.commit}" target="_blank">${commit.commit}</a><br>
+            <strong>Date:</strong> ${commit.date.toDateString()}<br>
+            <strong>Time:</strong> ${commit.datetime.toLocaleTimeString()}<br>
+            <strong>Author:</strong> ${commit.author}<br>
+            <strong>Lines Edited:</strong> ${commit.line}
+        `);
 }
 
 // ====================
