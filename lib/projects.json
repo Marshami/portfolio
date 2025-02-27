@@ -1,61 +1,73 @@
 [
     {
-        "title": "Which Major U.S. City Has the Most Extreme Sunshine and Rainfall Patterns?",
+        "title": "Which Major U.S. City Has The Most Extreme Sunshine And Rainfall Patterns?",
+        "year": "2025",
         "image": "images/project1.jpg",
         "description": "Analyzing weather data from six major U.S. cities, this project examines seasonal extremes in sunshine and rainfall. Miami experiences the highest rainfall surges, while Chicago shows the greatest sunshine variability. Visualizations highlight how extreme differs by metric."
     },
     {
-        "title": "Nobis consequuntur rerum quas.",
-        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
-        "description": "Architecto explicabo harum recusandae rem pariatur labore, quae deserunt assumenda quidem repudiandae! Tenetur, minus. Fugiat, voluptas ut, maiores asperiores hic doloremque a consequuntur dignissimos cupiditate minima sunt? Architecto, nobis iste."
+        "title": "How Does The Average Mouse Temperature Change Over The Course Of The Entire Experiment?",
+        "year": "2025",
+        "image": "images/project2.jpg",
+        "description": "Both figures analyze how average mouse temperature changes over a 14-day experiment. Figure 1 presents the full range (36°C–38.5°C), showing natural fluctuations. Figure 2 narrows the y-axis (36.2°C–36.7°C), exaggerating shifts. This highlights how axis scaling impacts data interpretation."
     },
     {
         "title": "Amet consequuntur asperiores saepe!",
+        "year": "TBA",
         "image": "https://vis-society.github.io/labs/2/images/empty.svg",
         "description": "Autem fugit soluta cum illum eum architecto magnam cumque, esse officiis enim libero in hic voluptas totam aut ipsum repellendus assumenda reprehenderit quasi sit. Consectetur architecto voluptatem asperiores ab ex."
     },
     {
         "title": "Maiores cum mollitia repellendus?",
+        "year": "TBA",
         "image": "https://vis-society.github.io/labs/2/images/empty.svg",
         "description": "Natus cum tempore assumenda ex tempora facere rerum totam! Incidunt saepe blanditiis repellendus dolores dolorum error porro nisi cupiditate consequatur inventore officia dignissimos ipsam aspernatur, ut sit explicabo natus possimus!"
     },
     {
         "title": "Minima illum accusamus corporis?",
+        "year": "TBA",
         "image": "https://vis-society.github.io/labs/2/images/empty.svg",
         "description": "Ut natus vel illo repudiandae ab, architecto atque dolore reprehenderit. Ipsam, error nam illo aliquam maiores dolores repellat saepe dolorum nobis, quo vel nemo perspiciatis similique voluptate ipsum, consectetur laborum."
     },
     {
         "title": "Laboriosam non et corrupti.",
+        "year": "TBA",
         "image": "https://vis-society.github.io/labs/2/images/empty.svg",
         "description": "Quo dolore asperiores eum corporis explicabo modi quasi mollitia maxime repellat, eos voluptas quae. Incidunt, voluptates laudantium nostrum nesciunt ipsum eum culpa. Cumque necessitatibus inventore, voluptatum aliquid expedita eligendi voluptatibus."
     },
     {
         "title": "Est consequuntur laudantium reiciendis.",
+        "year": "TBA",
         "image": "https://vis-society.github.io/labs/2/images/empty.svg",
         "description": "Error quaerat suscipit dolores autem odio, ipsum ad cum voluptatibus similique id officiis voluptas, asperiores consequuntur eum neque magni dicta exercitationem illum molestiae necessitatibus quis, itaque praesentium? Aut, voluptate blanditiis."
     },
     {
         "title": "Nemo unde cum ipsa.",
+        "year": "TBA",
         "image": "https://vis-society.github.io/labs/2/images/empty.svg",
         "description": "Cum nulla provident officia tenetur sint labore. Quos sapiente numquam quasi, cumque corrupti suscipit veniam quam facere aut quisquam fugiat labore at odio dicta nisi debitis iure rerum maiores praesentium."
     },
     {
         "title": "Qui praesentium sit totam.",
+        "year": "TBA",
         "image": "https://vis-society.github.io/labs/2/images/empty.svg",
         "description": "Dolor sapiente, dolorem voluptate fuga ducimus impedit similique minus alias sequi libero deserunt, voluptatem unde. Animi voluptatum voluptates, praesentium velit quo exercitationem optio maxime distinctio iste quam non inventore. Quo?"
     },
     {
         "title": "Doloremque aperiam nulla est.",
+        "year": "TBA",
         "image": "https://vis-society.github.io/labs/2/images/empty.svg",
         "description": "Impedit voluptates, nihil laudantium voluptatum obcaecati autem sapiente sit ipsa quisquam est ex sed praesentium amet quod. Exercitationem reiciendis deserunt odit quos ipsam doloremque qui quas deleniti, doloribus, fugit dolores!"
     },
     {
         "title": "Iure amet deserunt minima.",
+        "year": "TBA",
         "image": "https://vis-society.github.io/labs/2/images/empty.svg",
         "description": "Modi quo dolor minus, eius accusantium non repudiandae, iusto tempora expedita blanditiis veritatis porro asperiores id, voluptates voluptate! Deleniti perferendis numquam molestias! Enim voluptatum, tempore corporis ipsum commodi tempora nulla."
     },
     {
         "title": "Deleniti dignissimos explicabo ratione?",
+        "year": "TBA",
         "image": "https://vis-society.github.io/labs/2/images/empty.svg",
         "description": "Expedita culpa aut vero illo alias ad nemo beatae dolor eveniet veniam inventore optio mollitia qui enim, dicta, recusandae soluta aperiam dolores nam reprehenderit repudiandae! Beatae distinctio sint recusandae eveniet?"
     }
