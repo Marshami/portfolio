@@ -12,7 +12,7 @@ displayLatestProjects();
 import { fetchGitHubData } from './global.js';
 
 async function displayGitHubStats() {
-    const githubData = await fetchGitHubData('your-username');  // Replace with your username
+    const githubData = await fetchGitHubData('marshami');  // Replace with your username
     const profileStats = document.querySelector('#profile-stats');
 
     if (profileStats) {
