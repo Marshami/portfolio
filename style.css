@@ -134,4 +134,36 @@ form button:hover {
     border-radius: 5px;
   }
   
+  #profile-stats {
+    font-family: Arial, sans-serif;
+    max-width: 300px;
+    margin: 20px auto;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+#profile-stats h2 {
+    font-size: 1.5rem;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+#profile-stats dl {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 10px;
+}
+
+#profile-stats dt {
+    font-weight: bold;
+    text-align: left;
+}
+
+#profile-stats dd {
+    text-align: right;
+    margin: 0;
+}
+
   
