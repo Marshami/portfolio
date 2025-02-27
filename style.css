@@ -169,21 +169,35 @@ form button:hover {
     font-weight: normal;
 }
 
+/* Global dark mode settings */
 @media (prefers-color-scheme: dark) {
   body {
-      background-color: #121212; /* Dark background */
-      color: #ffffff; /* Light text for rest of site */
+      background-color: #121212;
+      color: #ffffff;
   }
 
-  /* Keep text dark inside white boxes */
+  /* Ensure text inside white containers stays black */
   .projects-container, .github-profile {
-      background-color: #ffffff !important; /* Ensure white background */
+      background-color: #ffffff !important; /* Keep background white */
       color: #000000 !important; /* Keep text black */
   }
 
-  /* Make sure headings and paragraphs inside stay dark */
   .projects-container h2, .projects-container p,
   .github-profile h2, .github-profile p {
-      color: #000000 !important;
+      color: #000000 !important; /* Force text to stay black */
   }
+}
+
+/* Ensure white box text stays black in dark mode */
+.dark-mode .projects-container,
+.dark-mode .github-profile {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+}
+
+.dark-mode .projects-container h2,
+.dark-mode .projects-container p,
+.dark-mode .github-profile h2,
+.dark-mode .github-profile p {
+    color: #000000 !important;
 }
