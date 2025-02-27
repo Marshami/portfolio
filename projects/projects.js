@@ -21,7 +21,7 @@ async function loadProjects() {
 
     const projectsContainer = document.querySelector('.projects');
     if (!projectsContainer) {
-        console.error("No .projects container found!");
+        console.error("❌ No .projects container found!");
         return;
     }
 
@@ -34,7 +34,7 @@ async function loadProjects() {
         allProjects = await fetchJSON(jsonPath); // Store projects globally
         console.log("✅ Loaded projects:", allProjects);
 
-        // Initially render everything (no filters yet)
+        // Initially render everything (no filters applied)
         filterProjects();
 
     } catch (error) {
@@ -49,6 +49,8 @@ loadProjects();
 // ====================
 
 function renderPieChart(projects) {
+    console.log("🔄 Rendering Pie Chart with", projects.length, "projects");
+
     let rolledData = d3.rollups(
         projects,
         v => v.length,
@@ -82,9 +84,9 @@ function renderPieChart(projects) {
         .attr('stroke', '#fff')
         .attr('stroke-width', 2)
         .on('click', (event, d) => {
-            // Toggle selected year
+            console.log("🔄 Pie Slice Clicked:", d.data.label);
             selectedYear = (selectedYear === d.data.label) ? null : d.data.label;
-            filterProjects(); // Apply combined filters (search + year)
+            filterProjects(); // ✅ Apply combined filters (search + year)
         });
 
     renderLegend(data, colorScale);
@@ -95,6 +97,8 @@ function renderPieChart(projects) {
 // ====================
 
 function renderLegend(data, colorScale) {
+    console.log("🔄 Rendering Legend");
+
     let legend = d3.select('.legend');
     legend.selectAll('*').remove();
 
@@ -106,9 +110,9 @@ function renderLegend(data, colorScale) {
             ${d.label} <em>(${d.value})</em>
         `)
         .on('click', (event, d) => {
-            // Toggle selected year
+            console.log("🔄 Legend Item Clicked:", d.label);
             selectedYear = (selectedYear === d.label) ? null : d.label;
-            filterProjects(); // Apply combined filters (search + year)
+            filterProjects(); // ✅ Apply combined filters (search + year)
         });
 }
 
@@ -117,12 +121,21 @@ function renderLegend(data, colorScale) {
 // ====================
 
 function filterProjects() {
+    console.log(`🔄 Filtering projects | Search: "${searchQuery}" | Year: "${selectedYear}"`);
+
+    if (!allProjects.length) {
+        console.warn("⚠️ No projects available for filtering!");
+        return;
+    }
+
     // Apply both filters: searchQuery and selectedYear
     let filteredProjects = allProjects.filter(project => {
         let matchesSearch = Object.values(project).join(' ').toLowerCase().includes(searchQuery);
         let matchesYear = selectedYear ? project.year === selectedYear : true;
         return matchesSearch && matchesYear;
     });
+
+    console.log("✅ Filtered Projects:", filteredProjects);
 
     // Render the filtered list and pie chart
     renderProjects(filteredProjects, document.querySelector('.projects'), 'h2');
@@ -135,8 +148,9 @@ function filterProjects() {
 
 let searchInput = document.querySelector('.searchBar');
 searchInput.addEventListener('input', (event) => {
-    searchQuery = event.target.value.toLowerCase(); // Store the new query
-    filterProjects(); // Apply combined filters
+    searchQuery = event.target.value.toLowerCase(); // ✅ Store the new query
+    console.log("🔄 Search Query Updated:", searchQuery);
+    filterProjects(); // ✅ Apply combined filters
 });
 
 // End of file
