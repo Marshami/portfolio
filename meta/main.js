@@ -12,21 +12,19 @@ async function loadData() {
     data = await d3.csv('loc.csv', (row) => ({
         commit: row.commit,
         author: row.author,
-        // Combine date & timezone to get a local date object
         date: new Date(row.date + 'T00:00' + row.timezone),
-        // Full datetime object
         datetime: new Date(row.datetime),
-        line: +row.line,     // # of lines in this row
-        depth: +row.depth,   // Nesting depth
-        length: +row.length, // Length of that line
+        line: +row.line, 
+        depth: +row.depth,   
+        length: +row.length,
     }));
 
     console.log("✅ Loaded Data:", data);
 
-    // 1) Display summary stats (commits, lines, file length, etc.)
+    // 1) Display summary stats
     displayStats();
 
-    // 2) Create scatterplot (commits by time of day)
+    // 2) Create scatterplot
     createScatterplot();
 }
 
@@ -34,12 +32,10 @@ async function loadData() {
 // 🚀 Display Summary Stats
 // ====================
 function displayStats() {
-    // Basic stats
     const totalCommits = new Set(data.map(d => d.commit)).size;
-    const totalLines   = d3.sum(data, d => d.line);
-    const avgFileLen   = d3.mean(data, d => d.length);
+    const totalLines = d3.sum(data, d => d.line);
+    const avgFileLen = d3.mean(data, d => d.length);
 
-    // Add stats to #stats container
     const stats = d3.select("#stats")
         .append("dl")
         .attr("class", "stats");
@@ -67,7 +63,7 @@ function createScatterplot() {
         return;
     }
 
-    // ✅ Remove only the SVG, but KEEP the tooltip in the DOM
+    // ✅ Remove existing SVG before appending a new one
     d3.select("#chart").selectAll("svg").remove();
 
     const width = 1000, height = 600;
@@ -138,7 +134,7 @@ function createScatterplot() {
             d3.select(this).attr("fill-opacity", 1);
         })
         .on("mousemove", function (event) {
-            const tooltipWidth  = tooltip.node().getBoundingClientRect().width;
+            const tooltipWidth = tooltip.node().getBoundingClientRect().width;
             const tooltipHeight = tooltip.node().getBoundingClientRect().height;
 
             let xPos = event.pageX + 10;
@@ -152,26 +148,25 @@ function createScatterplot() {
             }
 
             tooltip.style("left", `${xPos}px`)
-                   .style("top",  `${yPos}px`);
+                   .style("top", `${yPos}px`);
         })
         .on("mouseleave", function () {
             tooltip.style("visibility", "hidden");
             d3.select(this).attr("fill-opacity", 0.7);
         });
 
-    // 6) Add Brushing
+    // 6) Add Brushing with Highlight
     const brush = d3.brush()
         .on("start brush end", (event) => {
             if (!event.selection) return;
             const [[x0, y0], [x1, y1]] = event.selection;
 
-            const selectedData = data.filter(d => {
-                const cx = xScale(d.datetime);
-                const cy = yScale(d.datetime.getHours());
-                return (cx >= x0 && cx <= x1 && cy >= y0 && cy <= y1);
-            });
-
-            console.log("Selected commits:", selectedData);
+            dots.selectAll("circle")
+                .attr("fill", d => {
+                    const cx = xScale(d.datetime);
+                    const cy = yScale(d.datetime.getHours());
+                    return (cx >= x0 && cx <= x1 && cy >= y0 && cy <= y1) ? "red" : "steelblue";
+                });
         });
 
     svg.append("g").call(brush);
@@ -184,7 +179,6 @@ function createScatterplot() {
 // 🚀 Tooltip Content
 // ====================
 function updateTooltipContent(commit) {
-    // Fill in tooltip fields
     d3.select("#commit-link")
       .attr("href", `https://github.com/YOUR_REPO/commit/${commit.commit}`)
       .text(commit.commit);
