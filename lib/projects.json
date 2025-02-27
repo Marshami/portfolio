@@ -2,7 +2,7 @@
     {
         "title": "Which Major U.S. City Has the Most Extreme Sunshine and Rainfall Patterns?",
         "image": "images/project1.jpg",
-        "description": "This project explores which major U.S. city experiences the most extreme seasonal shifts in sunshine and rainfall. Using weather data from six cities, I transformed the dataset for easy visualization in Altair, creating faceted plots that clearly show seasonal trends. Miami stands out for its extreme summer rainfall, while Chicago has the most significant sunshine variability. The results highlight how different cities experience "extreme" weather in unique ways, influencing everything from travel planning to urban water management."
+        "description": "Analyzing weather data from six major U.S. cities, this project examines seasonal extremes in sunshine and rainfall. Miami experiences the highest rainfall surges, while Chicago shows the greatest sunshine variability. Visualizations highlight how extreme differs by metric."
     },
     {
         "title": "Nobis consequuntur rerum quas.",
