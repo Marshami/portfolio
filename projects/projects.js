@@ -8,9 +8,9 @@ console.log("✅ D3 Loaded:", d3);
 // ====================
 // 🎯 Global Variables
 // ====================
-let allProjects = [];   // Stores all projects loaded from JSON
-let selectedYear = null;  // Tracks which year is selected (pie slice / legend)
-let searchQuery = '';     // Tracks the current search input
+let allProjects = [];    // Stores all projects loaded from JSON
+let selectedYear = null; // Tracks which year is selected (pie slice / legend)
+let searchQuery = '';    // Tracks the current search input
 
 // ====================
 // 🎯 Step 3: Load Project Data and Prepare Pie Chart
@@ -62,9 +62,10 @@ function renderPieChart(projects) {
         label: year
     }));
 
-    // Create a color scale based on each year label
+    // Create a persistent color scale based on each year
+    let allYears = [...new Set(allProjects.map(project => project.year))]; // Get unique years from all data
     let colorScale = d3.scaleOrdinal(d3.schemeTableau10)
-        .domain(data.map(d => d.label));
+        .domain(allYears); // Ensures consistent colors even after filtering
 
     let pieGenerator = d3.pie().value(d => d.value);
     let arcData = pieGenerator(data);
@@ -76,17 +77,24 @@ function renderPieChart(projects) {
     let svg = d3.select('#projects-pie-plot');
     svg.selectAll('*').remove(); // Clear old chart
 
-    svg.selectAll('path')
+    let paths = svg.selectAll('path')
         .data(arcData)
         .join('path')
         .attr('d', arcGenerator)
         .attr('fill', d => colorScale(d.data.label))
         .attr('stroke', '#fff')
         .attr('stroke-width', 2)
+        .style('opacity', d => (selectedYear && d.data.label !== selectedYear) ? 0.4 : 1) // ✅ Desaturate non-selected
         .on('click', (event, d) => {
             console.log("🔄 Pie Slice Clicked:", d.data.label);
             selectedYear = (selectedYear === d.data.label) ? null : d.data.label;
-            filterProjects(); // ✅ Apply combined filters (search + year)
+            filterProjects();
+        })
+        .on('mouseover', function (event, d) {
+            paths.style('opacity', p => (p.data.label !== d.data.label) ? 0.4 : 1); // ✅ Desaturate on hover
+        })
+        .on('mouseout', function () {
+            paths.style('opacity', d => (selectedYear && d.data.label !== selectedYear) ? 0.4 : 1); // ✅ Restore selection filter
         });
 
     renderLegend(data, colorScale);
@@ -109,10 +117,11 @@ function renderLegend(data, colorScale) {
             <span class="swatch" style="background:${colorScale(d.label)}"></span> 
             ${d.label} <em>(${d.value})</em>
         `)
+        .style('opacity', d => (selectedYear && d.label !== selectedYear) ? 0.4 : 1) // ✅ Desaturate in legend
         .on('click', (event, d) => {
             console.log("🔄 Legend Item Clicked:", d.label);
             selectedYear = (selectedYear === d.label) ? null : d.label;
-            filterProjects(); // ✅ Apply combined filters (search + year)
+            filterProjects();
         });
 }
 
@@ -128,7 +137,6 @@ function filterProjects() {
         return;
     }
 
-    // Apply both filters: searchQuery and selectedYear
     let filteredProjects = allProjects.filter(project => {
         let matchesSearch = Object.values(project).join(' ').toLowerCase().includes(searchQuery);
         let matchesYear = selectedYear ? project.year === selectedYear : true;
@@ -137,7 +145,6 @@ function filterProjects() {
 
     console.log("✅ Filtered Projects:", filteredProjects);
 
-    // Render the filtered list and pie chart
     renderProjects(filteredProjects, document.querySelector('.projects'), 'h2');
     renderPieChart(filteredProjects);
 }
@@ -150,7 +157,7 @@ let searchInput = document.querySelector('.searchBar');
 searchInput.addEventListener('input', (event) => {
     searchQuery = event.target.value.toLowerCase(); // ✅ Store the new query
     console.log("🔄 Search Query Updated:", searchQuery);
-    filterProjects(); // ✅ Apply combined filters
+    filterProjects();
 });
 
 // End of file
