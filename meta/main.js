@@ -30,6 +30,12 @@ async function loadData() {
 function displayStats() {
     const totalCommits = new Set(data.map(d => d.commit)).size;
     const totalLines = d3.sum(data, d => d.line);
+    const avgFileLen = d3.mean(data, d => d.length);
+
+    console.log("Debug Stats:");
+    console.log("Total Commits:", totalCommits);
+    console.log("Total LOC:", totalLines);
+    console.log("Avg File Length:", avgFileLen);
 
     const stats = d3.select("#stats")
         .append("dl")
@@ -40,6 +46,14 @@ function displayStats() {
 
     stats.append("dt").text("Total Lines of Code (LOC)");
     stats.append("dd").text(totalLines);
+
+    // ✅ Check if avgFileLen is valid before appending
+    if (!isNaN(avgFileLen) && avgFileLen !== undefined) {
+        stats.append("dt").text("Average File Length");
+        stats.append("dd").text(avgFileLen.toFixed(2));
+    } else {
+        console.warn("⚠️ Warning: Avg File Length is undefined or NaN");
+    }
 
     console.log("✅ Stats Computed & Displayed");
 }
