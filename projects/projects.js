@@ -1,4 +1,4 @@
-import { fetchJSON, renderProjects } from '../global.js';
+import { fetchJSON, renderProjects } from '../global.js'; // ✅ Correct path from /projects/
 
 async function loadProjects() {
     console.log("Loading projects from JSON...");
