@@ -134,13 +134,18 @@ export async function fetchJSON(url) {
 }
 
 export function renderProjects(projects, containerElement) {
-  containerElement.innerHTML = '';  // Clear previous content
+  containerElement.innerHTML = ''; // Clear previous content
 
   projects.forEach(project => {
       const article = document.createElement('article');
+
+      // Automatically adjust for GitHub Pages by adding 'portfolio/' to image path
+      const basePath = window.location.hostname.includes("github.io") ? "portfolio/" : "";
+      const imageSrc = project.image ? `${basePath}${project.image}` : "portfolio/images/default.png";
+
       article.innerHTML = `
           <h2>${project.title}</h2>
-          <img src="${project.image}" alt="${project.title}">
+          <img src="${imageSrc}" alt="${project.title}" onerror="this.onerror=null; this.src='portfolio/images/default.png';">
           <p>${project.description}</p>
       `;
       containerElement.appendChild(article);
