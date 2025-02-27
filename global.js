@@ -83,10 +83,10 @@ function setTheme(mode) {
     document.documentElement.style.setProperty("color-scheme", mode);
     localStorage.setItem("theme", mode); // Save user preference
 
-    // Remove all theme classes first
+    // Remove any existing theme classes
     document.body.classList.remove("dark-mode", "light-mode", "auto-mode");
 
-    // Apply correct theme class
+    // Apply the correct theme class
     if (mode === "dark") {
         document.body.classList.add("dark-mode");
     } else if (mode === "light") {
@@ -94,9 +94,10 @@ function setTheme(mode) {
     } else {
         document.body.classList.add("auto-mode");
     }
+
+    console.log("Theme applied:", mode, "| Body classes:", document.body.classList);
 }
 
-  
   // Load saved theme from localStorage (if exists)
   const savedTheme = localStorage.getItem("theme") || "auto";
   setTheme(savedTheme); // Apply saved theme
