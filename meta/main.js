@@ -1,146 +1,165 @@
 console.log("✅ D3 script is running...");
 
 // ====================
-// 🎯 Step 1: Load Data
+// 🚀 Global Data Array
 // ====================
-
 let data = [];
 
+// ====================
+// 🚀 Load Data (loc.csv)
+// ====================
 async function loadData() {
     data = await d3.csv('loc.csv', (row) => ({
         commit: row.commit,
         author: row.author,
-        date: new Date(row.date),
+        // Combine date & timezone to get a local date object
+        date: new Date(row.date + 'T00:00' + row.timezone),
+        // Full datetime object
         datetime: new Date(row.datetime),
-        line: +row.line,  // Convert strings to numbers
-        depth: +row.depth,
-        length: +row.length,
+        line: +row.line,       // # of lines in this row
+        depth: +row.depth,     // Nesting depth in code
+        length: +row.length,   // Length of that line
     }));
 
     console.log("✅ Loaded Data:", data);
 
-    // Compute and display stats
+    // 1) Display summary stats (commits, lines, file length, etc.)
     displayStats();
 
-    // Create scatterplot
+    // 2) Create scatterplot (commits by time of day)
     createScatterplot();
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-    await loadData();
-});
-
 // ====================
-// 🎯 Step 2: Display Summary Stats
+// 🚀 Display Summary Stats
 // ====================
-
 function displayStats() {
     let totalCommits = new Set(data.map(d => d.commit)).size;
-    let totalLines = d3.sum(data, d => d.line);
-    let avgFileLength = d3.mean(data, d => d.length);
+    let totalLines   = d3.sum(data, d => d.line);
+    let avgFileLen   = d3.mean(data, d => d.length);
 
-    const statsContainer = d3.select("#stats").append("dl").attr("class", "stats");
-    
-    statsContainer.append("dt").text("Total Commits");
-    statsContainer.append("dd").text(totalCommits);
-    
-    statsContainer.append("dt").text("Total Lines of Code (LOC)");
-    statsContainer.append("dd").text(totalLines);
-    
-    statsContainer.append("dt").text("Average File Length");
-    statsContainer.append("dd").text(avgFileLength.toFixed(2));
+    const stats = d3.select("#stats")
+        .append("dl")
+        .attr("class", "stats");
+
+    stats.append("dt").text("Total Commits");
+    stats.append("dd").text(totalCommits);
+
+    stats.append("dt").text("Total Lines of Code (LOC)");
+    stats.append("dd").text(totalLines);
+
+    stats.append("dt").text("Average File Length");
+    stats.append("dd").text(avgFileLen.toFixed(2));
 
     console.log("✅ Stats Computed & Displayed");
 }
 
 // ====================
-// 🎯 Step 3: Create Scatterplot
+// 🚀 Create Scatterplot
 // ====================
-
 function createScatterplot() {
-    const width = 1000, height = 600, margin = 50;
-    
+    const width = 1000, height = 600;
+
+    // 1) Create SVG
     const svg = d3.select("#chart")
         .append("svg")
-        .attr("viewBox", `0 0 ${width + margin} ${height + margin}`)
-        .append("g")
-        .attr("transform", `translate(${margin}, ${margin})`);
+        .attr("viewBox", `0 0 ${width} ${height}`)
+        .style("overflow", "visible");
 
-    // X Scale - Time (Commit Timestamp)
+    // 2) Define Scales
     const xScale = d3.scaleTime()
         .domain(d3.extent(data, d => d.datetime))
         .range([0, width]);
 
-    // Y Scale - Hour of the Day
+    // Y axis is 0–24 hours
     const yScale = d3.scaleLinear()
         .domain([0, 24])
         .range([height, 0]);
 
-    // Dot Size Scale - Based on Lines Edited
+    // Radius scale based on # lines in each commit
+    const [minLine, maxLine] = d3.extent(data, d => d.line);
     const rScale = d3.scaleSqrt()
-        .domain(d3.extent(data, d => d.line))
-        .range([3, 15]);
+        .domain([minLine, maxLine])
+        .range([2, 30]); // Adjust max radius as needed
 
-    // X Axis
+    // 3) Add Axes
     svg.append("g")
-        .attr("transform", `translate(0, ${height})`)
-        .call(d3.axisBottom(xScale));
+       .attr("transform", `translate(0, ${height})`)
+       .call(d3.axisBottom(xScale));
 
-    // Y Axis
     svg.append("g")
-        .call(d3.axisLeft(yScale).tickFormat(d => `${d}:00`));
+       .call(d3.axisLeft(yScale).tickFormat(d => `${d}:00`));
 
-    // Dots (Commits)
-    const dots = svg.append("g").selectAll("circle")
+    // 4) Plot Circles
+    const dots = svg.append("g").attr("class", "dots");
+    dots.selectAll("circle")
         .data(data)
         .join("circle")
         .attr("cx", d => xScale(d.datetime))
         .attr("cy", d => yScale(d.datetime.getHours()))
         .attr("r", d => rScale(d.line))
         .attr("fill", "steelblue")
-        .style("opacity", 0.7)
-        .on("mouseenter", (event, d) => showTooltip(event, d))
-        .on("mouseleave", () => d3.select("#commit-tooltip").attr("hidden", true));
-
-    // ====================
-    // 🎯 Step 4: Add Brushing for Selection
-    // ====================
-
-    const brush = d3.brush()
-        .extent([[0, 0], [width, height]])
-        .on("end", (event) => {
-            const selection = event.selection;
-            if (!selection) return;
-
-            const [[x0, y0], [x1, y1]] = selection;
-
-            const selectedCommits = data.filter(d => {
-                let x = xScale(d.datetime);
-                let y = yScale(d.datetime.getHours());
-                return x >= x0 && x <= x1 && y >= y0 && y <= y1;
-            });
-
-            console.log("🔍 Selected Commits:", selectedCommits);
+        .attr("fill-opacity", 0.7)
+        .on("mouseenter", (event, d) => {
+            updateTooltipContent(d);
+            d3.select("#commit-tooltip").attr("hidden", null);
+            // Make hovered dot fully opaque
+            d3.select(event.currentTarget).attr("fill-opacity", 1);
+        })
+        .on("mousemove", (event) => {
+            // Move tooltip with mouse
+            d3.select("#commit-tooltip")
+              .style("left", event.pageX + "px")
+              .style("top", event.pageY + "px");
+        })
+        .on("mouseleave", (event) => {
+            d3.select("#commit-tooltip").attr("hidden", true);
+            d3.select(event.currentTarget).attr("fill-opacity", 0.7);
         });
 
-    svg.append("g").call(brush);
+    // 5) Brush for selecting commits
+    const brush = d3.brush()
+        .on("start brush end", (event) => {
+            // event.selection = [[x0, y0], [x1, y1]]
+            if (!event.selection) return; // no selection
+            const [[x0, y0], [x1, y1]] = event.selection;
+            
+            // Filter data within the brush
+            const selectedData = data.filter(d => {
+                const cx = xScale(d.datetime);
+                const cy = yScale(d.datetime.getHours());
+                return (cx >= x0 && cx <= x1 && cy >= y0 && cy <= y1);
+            });
+
+            console.log("Selected commits:", selectedData);
+        });
+
+    // Place the brush below the dots so tooltips still work
+    const brushGroup = svg.append("g").call(brush);
+    // Raise the dots above the brush overlay
+    dots.raise();
 
     console.log("✅ Scatter Plot Created");
 }
 
 // ====================
-// 🎯 Step 5: Add Tooltip for Hover
+// 🚀 Tooltip Content
 // ====================
+function updateTooltipContent(commit) {
+    d3.select("#commit-link")
+      .attr("href", `https://github.com/YOUR_REPO/commit/${commit.commit}`)
+      .text(commit.commit);
 
-function showTooltip(event, commit) {
-    d3.select("#commit-link").attr("href", `https://github.com/YOUR_REPO/commit/${commit.commit}`).text(commit.commit);
     d3.select("#commit-date").text(commit.date.toDateString());
     d3.select("#commit-time").text(commit.datetime.toLocaleTimeString());
     d3.select("#commit-author").text(commit.author);
     d3.select("#commit-lines").text(commit.line);
-
-    const tooltip = d3.select("#commit-tooltip")
-        .attr("hidden", null)
-        .style("left", `${event.pageX + 10}px`)
-        .style("top", `${event.pageY + 10}px`);
 }
+
+// ====================
+// 🚀 DOMContentLoaded
+// ====================
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadData();
+    console.log("✅ D3 script loaded and visualizations created!");
+});
