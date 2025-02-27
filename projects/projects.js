@@ -6,32 +6,36 @@ import { fetchJSON, renderProjects } from '../global.js'; // ✅ Correct path fr
 console.log("✅ D3 Loaded:", d3);
 
 // ====================
+// 🎯 Global Variables
+// ====================
+let allProjects = [];   // Stores all projects loaded from JSON
+let selectedYear = null;  // Tracks which year is selected (pie slice / legend)
+let searchQuery = '';     // Tracks the current search input
+
+// ====================
 // 🎯 Step 3: Load Project Data and Prepare Pie Chart
 // ====================
-
-let allProjects = [];  // ✅ Stores all project data
-let selectedYear = null; // ✅ Stores selected pie slice
-let searchQuery = '';  // ✅ Stores search query
 
 async function loadProjects() {
     console.log("Loading projects from JSON...");
 
     const projectsContainer = document.querySelector('.projects');
     if (!projectsContainer) {
-        console.error("❌ No .projects container found!");
+        console.error("No .projects container found!");
         return;
     }
 
+    // Determine correct JSON path
     const jsonPath = window.location.pathname.includes('/projects/')
         ? '../lib/projects.json'
         : './lib/projects.json';
 
     try {
-        allProjects = await fetchJSON(jsonPath); // ✅ Store projects globally
+        allProjects = await fetchJSON(jsonPath); // Store projects globally
         console.log("✅ Loaded projects:", allProjects);
 
-        renderProjects(allProjects, projectsContainer, 'h2');
-        renderPieChart(allProjects); // ✅ Initial Pie Chart Render
+        // Initially render everything (no filters yet)
+        filterProjects();
 
     } catch (error) {
         console.error("❌ Error fetching projects:", error);
@@ -41,7 +45,7 @@ async function loadProjects() {
 loadProjects();
 
 // ====================
-// 🎯 Step 1.5 - Step 3: Generate Pie Chart Based on Project Data
+// 🎯 Step 1.5 - Step 3: Generate Pie Chart Based on Filtered Data
 // ====================
 
 function renderPieChart(projects) {
@@ -56,6 +60,7 @@ function renderPieChart(projects) {
         label: year
     }));
 
+    // Create a color scale based on each year label
     let colorScale = d3.scaleOrdinal(d3.schemeTableau10)
         .domain(data.map(d => d.label));
 
@@ -67,7 +72,7 @@ function renderPieChart(projects) {
         .outerRadius(80);
 
     let svg = d3.select('#projects-pie-plot');
-    svg.selectAll('*').remove();
+    svg.selectAll('*').remove(); // Clear old chart
 
     svg.selectAll('path')
         .data(arcData)
@@ -77,8 +82,9 @@ function renderPieChart(projects) {
         .attr('stroke', '#fff')
         .attr('stroke-width', 2)
         .on('click', (event, d) => {
-            selectedYear = selectedYear === d.data.label ? null : d.data.label; // ✅ Toggle selection
-            filterProjects(); // ✅ Apply combined filtering
+            // Toggle selected year
+            selectedYear = (selectedYear === d.data.label) ? null : d.data.label;
+            filterProjects(); // Apply combined filters (search + year)
         });
 
     renderLegend(data, colorScale);
@@ -90,7 +96,6 @@ function renderPieChart(projects) {
 
 function renderLegend(data, colorScale) {
     let legend = d3.select('.legend');
-
     legend.selectAll('*').remove();
 
     legend.selectAll('li')
@@ -101,24 +106,27 @@ function renderLegend(data, colorScale) {
             ${d.label} <em>(${d.value})</em>
         `)
         .on('click', (event, d) => {
-            selectedYear = selectedYear === d.label ? null : d.label; // ✅ Toggle selection
-            filterProjects(); // ✅ Apply combined filtering
+            // Toggle selected year
+            selectedYear = (selectedYear === d.label) ? null : d.label;
+            filterProjects(); // Apply combined filters (search + year)
         });
 }
 
 // ====================
-// 🎯 Step 5: Combined Filtering (Search + Pie Click)
+// 🎯 Step 5: Filter Projects (Combined Search + Pie Slice Filter)
 // ====================
 
 function filterProjects() {
+    // Apply both filters: searchQuery and selectedYear
     let filteredProjects = allProjects.filter(project => {
         let matchesSearch = Object.values(project).join(' ').toLowerCase().includes(searchQuery);
         let matchesYear = selectedYear ? project.year === selectedYear : true;
-        return matchesSearch && matchesYear; // ✅ Ensures both filters work together
+        return matchesSearch && matchesYear;
     });
 
+    // Render the filtered list and pie chart
     renderProjects(filteredProjects, document.querySelector('.projects'), 'h2');
-    renderPieChart(filteredProjects); // ✅ Updates pie chart dynamically
+    renderPieChart(filteredProjects);
 }
 
 // ====================
@@ -126,11 +134,9 @@ function filterProjects() {
 // ====================
 
 let searchInput = document.querySelector('.searchBar');
-
 searchInput.addEventListener('input', (event) => {
-    searchQuery = event.target.value.toLowerCase(); // ✅ Store search query
-    filterProjects(); // ✅ Apply combined filtering
+    searchQuery = event.target.value.toLowerCase(); // Store the new query
+    filterProjects(); // Apply combined filters
 });
 
-// ✅ Load Projects and Render Everything
-loadProjects();
+// End of file
