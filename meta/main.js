@@ -186,6 +186,49 @@ function createScatterplot() {
     dots.raise();
 }
 
+function updateSummary(selectedData) {
+    d3.select("#selected-summary").remove();
+
+    const summary = d3.select("#chart")
+        .append("div")
+        .attr("id", "selected-summary")
+        .style("margin-top", "20px")
+        .style("text-align", "center");
+
+    // ✅ If no commits are selected, show a placeholder message instead of removing everything
+    if (selectedData.length === 0) {
+        summary.append("p").text("No commits selected").style("font-style", "italic");
+        return;
+    }
+
+    const totalSelected = selectedData.length;
+    const typeCounts = d3.rollups(selectedData, v => d3.sum(v, d => d.line), d => d.type);
+    const totalLines = d3.sum(selectedData, d => d.line);
+
+    summary.append("p").text(`${totalSelected} commits selected`).style("text-align", "center");
+
+    // ✅ Create table for horizontal layout
+    const table = summary.append("div")
+        .attr("class", "summary-table")
+        .style("display", "flex")
+        .style("justify-content", "center")
+        .style("gap", "50px")
+        .style("margin-top", "10px");
+
+    typeCounts.forEach(([type, lines]) => {
+        const percentage = ((lines / totalLines) * 100).toFixed(1);
+
+        const column = table.append("div")
+            .attr("class", "summary-column")
+            .style("text-align", "center")
+            .style("font-family", "monospace");
+
+        column.append("p").html(`<strong>${type.toUpperCase()}</strong>`);
+        column.append("p").text(`${lines} lines`);
+        column.append("p").text(`(${percentage}%)`);
+    });
+}
+
 // ====================
 // 🚀 DOMContentLoaded
 // ====================
