@@ -141,7 +141,7 @@ export function renderProjects(projects, containerElement) {
 
       // Automatically adjust for GitHub Pages by adding 'portfolio/' to image path
       const basePath = window.location.hostname.includes("github.io") ? "portfolio/" : "";
-      const imageSrc = project.image ? `${basePath}${project.image}` : "portfolio/images/default.png";
+      const imageSrc = project.image ? `${basePath}${project.image}` : "images/default.png";
 
       article.innerHTML = `
           <h2>${project.title}</h2>
