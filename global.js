@@ -134,28 +134,21 @@ export async function fetchJSON(url) {
 }
 
 export function renderProjects(projects, containerElement) {
-  containerElement.innerHTML = ''; // Clear previous content
+    containerElement.innerHTML = ''; // Clear previous content
 
-  projects.forEach(project => {
-      const article = document.createElement('article');
+    projects.forEach(project => {
+        const article = document.createElement('article');
 
-      // Auto-adjust image path for GitHub Pages
-      const isGitHubPages = window.location.hostname.includes("github.io");
-      const basePath = isGitHubPages ? "/portfolio/" : "";  // ✅ Ensure no duplicate "portfolio/"
+        article.innerHTML = `
+            <h2>${project.title}</h2>
+            <img src="${project.image}" alt="${project.title}">
+            <p>${project.description}</p> <!-- ✅ Ensure this updates -->
+        `;
 
-      const imageSrc = project.image.startsWith("http") 
-          ? project.image 
-          : `${basePath}${project.image}`;
+        containerElement.appendChild(article);
+    });
 
-      const fallbackImage = `${basePath}images/default.png`; // ✅ Correct default image path
-
-      article.innerHTML = `
-          <h2>${project.title}</h2>
-          <img src="${imageSrc}" alt="${project.title}" onerror="this.onerror=null; this.src='${fallbackImage}';">
-          <p>${project.description}</p>
-      `;
-      containerElement.appendChild(article);
-  });
+    console.log("Projects rendered successfully!"); // Debugging log
 }
 
 export async function fetchGitHubData(username) {
