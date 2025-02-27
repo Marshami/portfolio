@@ -91,6 +91,19 @@ form button:hover {
     background-color: #0056b3; /* Darker blue on hover */
   }
 
+.dark-mode .projects-container,
+.dark-mode .github-profile {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+}
+
+.dark-mode .projects-container h2,
+.dark-mode .projects-container p,
+.dark-mode .github-profile h2,
+.dark-mode .github-profile p {
+    color: #000000 !important;
+}
+  
 .projects {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(15em, 1fr)); /* Responsive columns */
@@ -186,17 +199,4 @@ form button:hover {
   .github-profile h2, .github-profile p {
       color: #000000 !important; /* Keep headings and paragraphs black */
   }
-}
-
-.dark-mode .projects-container,
-.dark-mode .github-profile {
-    background-color: #ffffff !important;
-    color: #000000 !important;
-}
-
-.dark-mode .projects-container h2,
-.dark-mode .projects-container p,
-.dark-mode .github-profile h2,
-.dark-mode .github-profile p {
-    color: #000000 !important;
 }
