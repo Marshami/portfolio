@@ -82,7 +82,14 @@ document.body.insertAdjacentHTML(
   function setTheme(mode) {
     document.documentElement.style.setProperty("color-scheme", mode);
     localStorage.setItem("theme", mode); // Save user preference
-  }
+
+    // Add or remove dark mode class for better CSS control
+    if (mode === "dark") {
+        document.body.classList.add("dark-mode");
+    } else {
+        document.body.classList.remove("dark-mode");
+    }
+}
   
   // Load saved theme from localStorage (if exists)
   const savedTheme = localStorage.getItem("theme") || "auto";
