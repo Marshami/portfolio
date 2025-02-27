@@ -60,8 +60,6 @@ function displayStats() {
 // 🚀 Create Scatterplot
 // ====================
 function createScatterplot() {
-    // 1) Set Dimensions
-    const width = 1000, height = 600;
     console.log("🔄 Creating Scatterplot...");
 
     if (data.length === 0) {
@@ -69,7 +67,12 @@ function createScatterplot() {
         return;
     }
 
-    // 2) Create SVG
+    // ✅ Clear existing SVG before appending a new one
+    d3.select("#chart").selectAll("svg").remove();
+
+    const width = 1000, height = 600;
+
+    // 1) Create SVG
     const svg = d3.select("#chart")
         .append("svg")
         .attr("viewBox", `0 0 ${width} ${height}`)
@@ -77,7 +80,7 @@ function createScatterplot() {
 
     console.log("✅ SVG Created");
 
-    // 3) Define Scales
+    // 2) Define Scales
     const xScale = d3.scaleTime()
         .domain(d3.extent(data, d => d.datetime))
         .range([50, width - 50]);   // Margins for axes
@@ -94,20 +97,18 @@ function createScatterplot() {
 
     console.log("✅ Scales Created: X & Y");
 
-    // 4) Add Axes
-    // X Axis
+    // 3) Add Axes
     svg.append("g")
        .attr("transform", `translate(0, ${height - 50})`)
        .call(d3.axisBottom(xScale));
 
-    // Y Axis
     svg.append("g")
        .attr("transform", `translate(50, 0)`)
        .call(d3.axisLeft(yScale).tickFormat(d => `${d}:00`));
 
     console.log("✅ Axes Added");
 
-    // 5) Configure Tooltip
+    // 4) Configure Tooltip
     const tooltip = d3.select("#commit-tooltip")
         .style("position", "absolute")
         .style("pointer-events", "none")
@@ -118,7 +119,7 @@ function createScatterplot() {
         .style("box-shadow", "2px 2px 10px rgba(0,0,0,0.2)")
         .style("visibility", "hidden");
 
-    // 6) Plot Circles
+    // 5) Plot Circles
     const dots = svg.append("g").attr("class", "dots");
     dots.selectAll("circle")
         .data(data)
@@ -131,7 +132,7 @@ function createScatterplot() {
         .on("mouseenter", function (event, d) {
             updateTooltipContent(d);
             tooltip.style("visibility", "visible");
-            d3.select(this).attr("fill-opacity", 1); // Full opacity on hover
+            d3.select(this).attr("fill-opacity", 1);
         })
         .on("mousemove", function (event) {
             // Position tooltip near mouse
@@ -157,7 +158,7 @@ function createScatterplot() {
             d3.select(this).attr("fill-opacity", 0.7);
         });
 
-    // 7) Add Brushing
+    // 6) Add Brushing
     const brush = d3.brush()
         .on("start brush end", (event) => {
             if (!event.selection) return;
