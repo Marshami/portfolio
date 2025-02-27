@@ -139,17 +139,15 @@ export function renderProjects(projects, containerElement) {
   projects.forEach(project => {
       const article = document.createElement('article');
 
-      // Detect if hosted on GitHub Pages
+      // Auto-adjust image path for GitHub Pages
       const isGitHubPages = window.location.hostname.includes("github.io");
-      const basePath = isGitHubPages ? "/portfolio/" : "";  // ✅ Ensure single "portfolio/"
+      const basePath = isGitHubPages ? "/portfolio/" : "";  // ✅ Ensure no duplicate "portfolio/"
 
-      // Fix paths only if they don't already include "portfolio/"
-      const imageSrc = project.image.startsWith("portfolio/") 
+      const imageSrc = project.image.startsWith("http") 
           ? project.image 
           : `${basePath}${project.image}`;
 
-      // Ensure the default image path is correct
-      const fallbackImage = `${basePath}images/default.png`;
+      const fallbackImage = `${basePath}images/default.png`; // ✅ Correct default image path
 
       article.innerHTML = `
           <h2>${project.title}</h2>
