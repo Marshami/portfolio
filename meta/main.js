@@ -14,7 +14,7 @@ async function loadData() {
         author: row.author,
         date: new Date(row.date + 'T00:00' + row.timezone),
         datetime: new Date(row.datetime),
-        line: +row.line, 
+        line: +row.line,
         type: row.type, // File type (css, js, html)
     }));
 
@@ -45,7 +45,7 @@ function displayStats() {
 }
 
 // ====================
-// 🚀 Create Scatterplot
+// 🚀 Create Scatterplot with Grid Lines
 // ====================
 function createScatterplot() {
     console.log("🔄 Creating Scatterplot...");
@@ -78,9 +78,30 @@ function createScatterplot() {
 
     const rScale = d3.scaleSqrt()
         .domain(d3.extent(data, d => d.line))
-        .range([3, 25]); // ✅ Adjusted for better visualization
+        .range([3, 25]);
 
     console.log("✅ Scales Created");
+
+    // Add Grid Lines
+    const xAxisGrid = d3.axisBottom(xScale)
+        .tickSize(-height + margin.top + margin.bottom)
+        .tickFormat("");
+
+    const yAxisGrid = d3.axisLeft(yScale)
+        .tickSize(-width + margin.left + margin.right)
+        .tickFormat("");
+
+    svg.append("g")
+        .attr("class", "grid")
+        .attr("transform", `translate(0, ${height - margin.bottom})`)
+        .call(xAxisGrid);
+
+    svg.append("g")
+        .attr("class", "grid")
+        .attr("transform", `translate(${margin.left}, 0)`)
+        .call(yAxisGrid);
+
+    console.log("✅ Grid Lines Added");
 
     // Add Axes
     svg.append("g")
@@ -125,7 +146,7 @@ function createScatterplot() {
 
             dots.selectAll("circle")
                 .attr("fill", d => selectedData.includes(d) ? "red" : "steelblue")
-                .attr("fill-opacity", d => selectedData.includes(d) ? 1 : 0.2); // ✅ Non-selected dots fade
+                .attr("fill-opacity", d => selectedData.includes(d) ? 1 : 0.2);
 
             updateSummary(selectedData);
         });
