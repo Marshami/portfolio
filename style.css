@@ -135,9 +135,9 @@ form button:hover {
 }
 
 #projects-pie-plot {
-  max-width: 20em;
+  border: 2px dashed red; /* ✅ Debugging border */
+  max-width: 200px;
   margin-block: 2em;
-  overflow: visible;
 }
 
 /* ========================= */

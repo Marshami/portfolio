@@ -1,32 +1,20 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm";
 
 let arcGenerator = d3.arc()
-  .innerRadius(0)
-  .outerRadius(50);
+    .innerRadius(0)
+    .outerRadius(50);  // Controls the arc's size
 
 let arc = arcGenerator({
-  startAngle: 0,
-  endAngle: 2 * Math.PI
+    startAngle: 0,
+    endAngle: 2 * Math.PI
 });
 
+console.log("Arc Path Data:", arc);  // ✅ Debugging output
+
 d3.select('#projects-pie-plot')
-  .append('path')
-  .attr('d', arc)
-  .attr('fill', 'red');
-
-let data = [1, 2, 3, 4];
-let pieGenerator = d3.pie();
-let arcData = pieGenerator(data); 
-// arcData is an array of objects with startAngle, endAngle, etc.
-
-let arcs = arcData.map(d => arcGenerator(d));
-
-arcs.forEach((arc, index) => {
-    d3.select('#projects-pie-plot')
-      .append('path')
-      .attr('d', arc)
-      .attr('fill', /* color */)
-  });
+    .append('path')
+    .attr('d', arc)
+    .attr('fill', 'red');  // ✅ Change this to any color
 
 import { fetchJSON, renderProjects } from '../global.js'; // ✅ Correct path from /projects/
 
