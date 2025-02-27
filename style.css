@@ -139,6 +139,26 @@ form button:hover {
   height: 300px; /* Ensure it has height */
 }
 
+/* Space between search bar and pie chart */
+.searchBar {
+  margin-bottom: 1.5em; /* Adds spacing below the search bar */
+  padding: 0.5em;
+  width: 100%;
+  max-width: 300px; /* Limits search bar width */
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1em;
+}
+
+/* Ensure pie chart and legend are aligned properly */
+.chart-container {
+  display: flex;
+  flex-direction: column; /* Stack elements vertically */
+  align-items: center;
+  gap: 1.5em; /* Adds spacing between search bar, pie chart, and legend */
+  margin-top: 1em;
+}
+
 /* ========================= */
 /* COLOR SCHEME SWITCHER */
 /* ========================= */
