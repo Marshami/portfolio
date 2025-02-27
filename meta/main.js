@@ -67,7 +67,7 @@ function createScatterplot() {
         return;
     }
 
-    // ✅ Clear existing SVG before appending a new one
+    // ✅ Remove only the SVG, but KEEP the tooltip in the DOM
     d3.select("#chart").selectAll("svg").remove();
 
     const width = 1000, height = 600;
@@ -83,17 +83,15 @@ function createScatterplot() {
     // 2) Define Scales
     const xScale = d3.scaleTime()
         .domain(d3.extent(data, d => d.datetime))
-        .range([50, width - 50]);   // Margins for axes
+        .range([50, width - 50]);
 
     const yScale = d3.scaleLinear()
-        .domain([0, 24])           // 0–24 hours
-        .range([height - 50, 50]); // Margins for axes
+        .domain([0, 24])
+        .range([height - 50, 50]);
 
-    // Radius scale based on # lines in each commit
-    const [minLine, maxLine] = d3.extent(data, d => d.line);
     const rScale = d3.scaleSqrt()
-        .domain([minLine, maxLine])
-        .range([2, 30]); // Adjust as needed
+        .domain(d3.extent(data, d => d.line))
+        .range([2, 30]);
 
     console.log("✅ Scales Created: X & Y");
 
@@ -108,18 +106,23 @@ function createScatterplot() {
 
     console.log("✅ Axes Added");
 
-    // 4) Configure Tooltip
-    const tooltip = d3.select("#commit-tooltip")
-        .style("position", "absolute")
-        .style("pointer-events", "none")
-        .style("background", "#fff")
-        .style("border", "1px solid #ccc")
-        .style("padding", "8px")
-        .style("border-radius", "5px")
-        .style("box-shadow", "2px 2px 10px rgba(0,0,0,0.2)")
-        .style("visibility", "hidden");
+    // ✅ Ensure tooltip stays in DOM & is not removed
+    let tooltip = d3.select("#commit-tooltip");
+    if (tooltip.empty()) {
+        tooltip = d3.select("body").append("dl")
+            .attr("id", "commit-tooltip")
+            .attr("class", "info tooltip")
+            .style("position", "absolute")
+            .style("pointer-events", "none")
+            .style("background", "#fff")
+            .style("border", "1px solid #ccc")
+            .style("padding", "8px")
+            .style("border-radius", "5px")
+            .style("box-shadow", "2px 2px 10px rgba(0,0,0,0.2)")
+            .style("visibility", "hidden");
+    }
 
-    // 5) Plot Circles
+    // 4) Plot Circles
     const dots = svg.append("g").attr("class", "dots");
     dots.selectAll("circle")
         .data(data)
@@ -135,14 +138,12 @@ function createScatterplot() {
             d3.select(this).attr("fill-opacity", 1);
         })
         .on("mousemove", function (event) {
-            // Position tooltip near mouse
             const tooltipWidth  = tooltip.node().getBoundingClientRect().width;
             const tooltipHeight = tooltip.node().getBoundingClientRect().height;
 
             let xPos = event.pageX + 10;
             let yPos = event.pageY - tooltipHeight - 10;
 
-            // Boundary checks
             if (xPos + tooltipWidth > window.innerWidth) {
                 xPos = event.pageX - tooltipWidth - 10;
             }
@@ -164,7 +165,6 @@ function createScatterplot() {
             if (!event.selection) return;
             const [[x0, y0], [x1, y1]] = event.selection;
 
-            // Find dots in brush area
             const selectedData = data.filter(d => {
                 const cx = xScale(d.datetime);
                 const cy = yScale(d.datetime.getHours());
@@ -175,7 +175,7 @@ function createScatterplot() {
         });
 
     svg.append("g").call(brush);
-    dots.raise(); // Ensure dots are above the brush overlay
+    dots.raise();
 
     console.log("✅ Scatter Plot Created with", data.length, "points");
 }
