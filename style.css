@@ -182,21 +182,27 @@ form button:hover {
     font-weight: normal;
 }
 
-/* Global dark mode settings */
-@media (prefers-color-scheme: dark) {
-  body {
-      background-color: #121212;
-      color: #ffffff;
-  }
+/* Ensure text inside white sections remains black */
+.projects-container, .github-profile {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
 
-  /* Force white box text to stay black */
-  .projects-container, .github-profile {
-      background-color: #ffffff !important; /* Ensure white background */
-      color: #000000 !important; /* Force black text */
-  }
+.projects-container h2, .projects-container p,
+.github-profile h2, .github-profile p {
+  color: #000000 !important;
+}
 
-  .projects-container h2, .projects-container p,
-  .github-profile h2, .github-profile p {
-      color: #000000 !important; /* Keep headings and paragraphs black */
-  }
+/* In case dark mode class is added */
+.dark-mode .projects-container,
+.dark-mode .github-profile {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+.dark-mode .projects-container h2,
+.dark-mode .projects-container p,
+.dark-mode .github-profile h2,
+.dark-mode .github-profile p {
+  color: #000000 !important;
 }

@@ -79,17 +79,23 @@ document.body.insertAdjacentHTML(
   const themeSwitch = document.getElementById("theme-switch");
   
   // Function to update the theme
-  function setTheme(mode) {
+function setTheme(mode) {
     document.documentElement.style.setProperty("color-scheme", mode);
     localStorage.setItem("theme", mode); // Save user preference
 
-    // Add or remove dark mode class for better CSS control
+    // Remove all theme classes first
+    document.body.classList.remove("dark-mode", "light-mode", "auto-mode");
+
+    // Apply correct theme class
     if (mode === "dark") {
         document.body.classList.add("dark-mode");
+    } else if (mode === "light") {
+        document.body.classList.add("light-mode");
     } else {
-        document.body.classList.remove("dark-mode");
+        document.body.classList.add("auto-mode");
     }
 }
+
   
   // Load saved theme from localStorage (if exists)
   const savedTheme = localStorage.getItem("theme") || "auto";
