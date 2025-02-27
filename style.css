@@ -193,6 +193,14 @@ form button:hover {
   display: inline-block;
 }
 
+.no-projects-msg {
+  text-align: center;
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #555;
+  margin-top: 1em;
+}
+
 /* ========================= */
 /* COLOR SCHEME SWITCHER */
 /* ========================= */
