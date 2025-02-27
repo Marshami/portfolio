@@ -139,24 +139,58 @@ form button:hover {
   height: 300px; /* Ensure it has height */
 }
 
-/* Space between search bar and pie chart */
+/* Space between search bar and chart */
 .searchBar {
-  margin-bottom: 1.5em; /* Adds spacing below the search bar */
+  margin-bottom: 1.5em;
   padding: 0.5em;
   width: 100%;
-  max-width: 300px; /* Limits search bar width */
+  max-width: 300px; /* Keeps it compact */
   border: 1px solid #ccc;
   border-radius: 5px;
   font-size: 1em;
 }
 
-/* Ensure pie chart and legend are aligned properly */
+/* Layout for Pie Chart and Legend */
 .chart-container {
   display: flex;
-  flex-direction: column; /* Stack elements vertically */
-  align-items: center;
-  gap: 1.5em; /* Adds spacing between search bar, pie chart, and legend */
+  align-items: center;  /* Align items side by side */
+  gap: 2em;  /* Adds space between pie chart and legend */
+  justify-content: center;  /* Centers the entire component */
   margin-top: 1em;
+}
+
+/* SVG Pie Chart Styling */
+#projects-pie-plot {
+  max-width: 250px;
+  max-height: 250px;
+}
+
+/* Legend Styling */
+.legend {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Responsive layout */
+  gap: 0.5em;
+  padding: 0;
+  border: 1px solid #ccc; /* Adds a border around the legend */
+  padding: 0.5em;
+  border-radius: 8px;
+}
+
+/* Legend Item Styling */
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  font-size: 1em;
+}
+
+/* Color Swatch for Legend */
+.legend .swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
 }
 
 /* ========================= */

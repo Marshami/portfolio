@@ -60,8 +60,8 @@ function renderPieChart(projects) {
 
     // ✅ Create an Arc Generator (Defines how slices are drawn)
     let arcGenerator = d3.arc()
-        .innerRadius(0)  // Ensures it's a pie chart (not a donut)
-        .outerRadius(50); // Defines the size of the pie
+    .innerRadius(0)  // Keeps it a pie chart (not a donut)
+    .outerRadius(80); // Increase size of slices to match the second image
 
     // ✅ D3 Color Scale to Assign Different Colors
     let colors = d3.scaleOrdinal(d3.schemeTableau10);
@@ -104,9 +104,10 @@ function renderLegend(data, colors) {
     legend.selectAll('li')
         .data(data)
         .join('li')
-        .style('color', (d, i) => colors(i)) // Assign correct color
-        .html(d => `<span class="swatch" style="background:${colors(d.label)}"></span> ${d.label} <em>(${d.value})</em>`)
-        .on('click', (event, d) => filterProjectsByYear(d.label)); // ✅ Step 5: Click to filter projects
+        .html(d => `
+            <span class="swatch" style="background:${colors(d.label)}"></span> 
+            ${d.label} <em>(${d.value})</em>
+        `);
 }
 
 // ====================
