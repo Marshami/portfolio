@@ -169,6 +169,12 @@ export function renderProjects(projects, containerElement) {
       `;
 
       containerElement.appendChild(article);
+
+      article.innerHTML = `
+      <h2>${project.title} (${project.year})</h2>
+      <img src="${imageSrc}" alt="${project.title}">
+      <p>${project.description}</p>
+      `;
   });
 
   console.log("Projects injected successfully!"); // Debugging log
