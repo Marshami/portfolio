@@ -1,7 +1,7 @@
 import { fetchJSON, renderProjects } from '../global.js';
 
 async function loadProjects() {
-    console.log("Loading projects from JSON..."); // Debugging message
+    console.log("Loading projects from JSON...");
 
     const projectsContainer = document.querySelector('.projects');
     if (!projectsContainer) {
@@ -9,9 +9,14 @@ async function loadProjects() {
         return;
     }
 
+    // Dynamically determine correct JSON path
+    const jsonPath = window.location.pathname.includes('/projects/')
+        ? '../lib/projects.json'  // ✅ Correct path for /projects/index.html
+        : './lib/projects.json';  // ✅ Correct path for home page
+
     try {
-        const projects = await fetchJSON('../lib/projects.json'); 
-        console.log("Fetched projects:", projects); // ✅ Debugging log
+        const projects = await fetchJSON(jsonPath); 
+        console.log("Fetched projects:", projects);
 
         renderProjects(projects, projectsContainer, 'h2');
     } catch (error) {
