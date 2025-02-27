@@ -9,32 +9,35 @@ console.log("✅ D3 Loaded:", d3);
 // 🎯 Step 1.4: Creating a Static Pie Chart
 // ====================
 
-// Sample data: slice sizes (will be replaced with actual project data later)
+// Sample data: Each number represents a slice size
 let data = [1, 2, 3, 4, 5];
 
-// D3 Pie Generator: Computes startAngle & endAngle for each slice
+// ✅ Create a D3 Pie Generator (Computes startAngle & endAngle for each slice)
 let pieGenerator = d3.pie();  
-let arcData = pieGenerator(data); 
+let arcData = pieGenerator(data);  // ✅ This generates multiple slices
 
-// D3 Arc Generator: Defines how slices are drawn
+// ✅ Create an Arc Generator (Defines how slices are drawn)
 let arcGenerator = d3.arc()
-    .innerRadius(0)  // Makes it a pie chart (not a donut chart)
-    .outerRadius(50); // Controls the size of the pie
+    .innerRadius(0)  // Ensures it's a pie chart (not a donut)
+    .outerRadius(50); // Defines the size of the pie
 
-// D3 Color Scale for Slice Colors
+// ✅ D3 Color Scale to Assign Different Colors
 let colors = d3.scaleOrdinal(d3.schemeTableau10);
 
-// Select the `<svg>` container
+// ✅ Select the `<svg>` container
 let svg = d3.select('#projects-pie-plot');
 
 console.log("✅ Selected SVG:", svg);
 
-// Bind data and create pie slices
+// ✅ Remove the old full-circle arc
+svg.selectAll('path').remove();
+
+// ✅ Bind `arcData` to `path` elements and create pie slices
 svg.selectAll('path')
-    .data(arcData)
+    .data(arcData)  // ✅ Use calculated slice data
     .join('path')
-    .attr('d', arcGenerator) // Generate slice shape
-    .attr('fill', (d, i) => colors(i)) // Assign colors dynamically
+    .attr('d', arcGenerator) // ✅ Generates correct arc for each slice
+    .attr('fill', (d, i) => colors(i)) // ✅ Assigns a different color to each slice
     .attr('stroke', '#fff')
     .attr('stroke-width', 2);
 
