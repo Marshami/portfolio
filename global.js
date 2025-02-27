@@ -139,15 +139,14 @@ export function renderProjects(projects, containerElement) {
   projects.forEach(project => {
       const article = document.createElement('article');
 
-      // Auto-adjust image path for GitHub Pages
       const isGitHubPages = window.location.hostname.includes("github.io");
-      const basePath = isGitHubPages ? "/portfolio/" : "";  // ✅ Ensure no duplicate "portfolio/"
+      const basePath = isGitHubPages ? "/portfolio/" : "";  
 
       const imageSrc = project.image.startsWith("http") 
           ? project.image 
           : `${basePath}${project.image}`;
 
-      const fallbackImage = `${basePath}images/default.png`; // ✅ Correct default image path
+      const fallbackImage = `${basePath}images/default.png`;
 
       article.innerHTML = `
           <h2>${project.title} (${project.year})</h2>
@@ -157,6 +156,8 @@ export function renderProjects(projects, containerElement) {
 
       containerElement.appendChild(article);
   });
+
+  console.log("Projects injected successfully!"); // Debugging log
 }
 
 export async function fetchGitHubData(username) {

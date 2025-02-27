@@ -1,6 +1,8 @@
-console.log("Loading projects from JSON...");
+import { fetchJSON, renderProjects } from '../global.js';
 
 async function loadProjects() {
+    console.log("Loading projects from JSON..."); // Debugging message
+
     const projectsContainer = document.querySelector('.projects');
     if (!projectsContainer) {
         console.error("No .projects container found!");
@@ -8,7 +10,7 @@ async function loadProjects() {
     }
 
     try {
-        const projects = await fetchJSON('../lib/projects.json'); // ✅ Correct path
+        const projects = await fetchJSON('../lib/projects.json'); 
         console.log("Fetched projects:", projects); // ✅ Debugging log
 
         renderProjects(projects, projectsContainer, 'h2');
