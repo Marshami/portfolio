@@ -62,29 +62,20 @@ function renderPieChart(projects) {
         label: year
     }));
 
-    let svg = d3.select('#projects-pie-plot');
-    svg.selectAll('*').remove(); // ✅ Clear old chart
-
-    // ✅ If no data, show "No Projects Found" and return
-    if (data.length === 0) {
-        console.warn("⚠️ No projects available!");
-        d3.select('.chart-container').append('p')
-            .attr('class', 'no-projects-msg')
-            .text("No Projects Found");
-        return;
-    }
-
-    // ✅ Remove any old "No Projects Found" messages if projects exist
-    d3.select('.no-projects-msg').remove();
-
-    // ✅ Persistent color scale based on years
-    let allYears = [...new Set(allProjects.map(project => project.year))];
-    let colorScale = d3.scaleOrdinal(d3.schemeTableau10).domain(allYears);
+    // Create a persistent color scale based on each year
+    let allYears = [...new Set(allProjects.map(project => project.year))]; // Get unique years from all data
+    let colorScale = d3.scaleOrdinal(d3.schemeTableau10)
+        .domain(allYears); // Ensures consistent colors even after filtering
 
     let pieGenerator = d3.pie().value(d => d.value);
     let arcData = pieGenerator(data);
 
-    let arcGenerator = d3.arc().innerRadius(0).outerRadius(80);
+    let arcGenerator = d3.arc()
+        .innerRadius(0)
+        .outerRadius(80);
+
+    let svg = d3.select('#projects-pie-plot');
+    svg.selectAll('*').remove(); // Clear old chart
 
     let paths = svg.selectAll('path')
         .data(arcData)
@@ -93,17 +84,17 @@ function renderPieChart(projects) {
         .attr('fill', d => colorScale(d.data.label))
         .attr('stroke', '#fff')
         .attr('stroke-width', 2)
-        .style('opacity', d => (selectedYear && d.data.label !== selectedYear) ? 0.4 : 1)
+        .style('opacity', d => (selectedYear && d.data.label !== selectedYear) ? 0.4 : 1) // ✅ Desaturate non-selected
         .on('click', (event, d) => {
             console.log("🔄 Pie Slice Clicked:", d.data.label);
             selectedYear = (selectedYear === d.data.label) ? null : d.data.label;
             filterProjects();
         })
         .on('mouseover', function (event, d) {
-            paths.style('opacity', p => (p.data.label !== d.data.label) ? 0.4 : 1);
+            paths.style('opacity', p => (p.data.label !== d.data.label) ? 0.4 : 1); // ✅ Desaturate on hover
         })
         .on('mouseout', function () {
-            paths.style('opacity', d => (selectedYear && d.data.label !== selectedYear) ? 0.4 : 1);
+            paths.style('opacity', d => (selectedYear && d.data.label !== selectedYear) ? 0.4 : 1); // ✅ Restore selection filter
         });
 
     renderLegend(data, colorScale);
