@@ -9,6 +9,8 @@ console.log("✅ D3 Loaded:", d3);
 // 🎯 Step 3: Load Project Data and Prepare Pie Chart
 // ====================
 
+let allProjects = []; // ✅ Store project data globally
+
 async function loadProjects() {
     console.log("Loading projects from JSON...");
 
@@ -18,22 +20,23 @@ async function loadProjects() {
         return;
     }
 
-    // ✅ Determine correct JSON path
     const jsonPath = window.location.pathname.includes('/projects/')
-        ? '../lib/projects.json'  // ✅ Correct path for /projects/index.html
-        : './lib/projects.json';  // ✅ Correct path for home page
+        ? '../lib/projects.json'
+        : './lib/projects.json';
 
     try {
-        const projects = await fetchJSON(jsonPath);
-        console.log("✅ Fetched projects:", projects);
+        allProjects = await fetchJSON(jsonPath); // ✅ Store projects globally
+        console.log("✅ Loaded projects:", allProjects);
 
-        renderProjects(projects, projectsContainer, 'h2');
-        renderPieChart(projects); // ✅ Render Pie Chart with project data
+        renderProjects(allProjects, projectsContainer, 'h2');
+        renderPieChart(allProjects); // ✅ Initial Pie Chart Render
 
     } catch (error) {
         console.error("❌ Error fetching projects:", error);
     }
 }
+
+loadProjects();
 
 // ====================
 // 🎯 Step 1.5 - Step 3: Generate Pie Chart Based on Project Data
@@ -125,12 +128,13 @@ let searchInput = document.querySelector('.searchBar');
 searchInput.addEventListener('input', (event) => {
     let query = event.target.value.toLowerCase();
 
-    let filteredProjects = projects.filter(project => 
+    // ✅ Filter the projects using `lib/projects.json`
+    let filteredProjects = allProjects.filter(project => 
         Object.values(project).join(' ').toLowerCase().includes(query)
     );
 
     renderProjects(filteredProjects, document.querySelector('.projects'), 'h2');
-    renderPieChart(filteredProjects); // ✅ Update the pie chart dynamically
+    renderPieChart(filteredProjects); // ✅ Update pie chart with filtered data
 });
 
 // ✅ Load Projects and Render Everything
