@@ -1,11 +1,26 @@
-import { fetchJSON, renderProjects } from '../global.js';
+import { fetchJSON, renderProjects } from '../global.js'; // ✅ Correct relative path
 
 async function loadProjects() {
-    const projectsContainer = document.querySelector('.projects'); // Select the container
-    if (!projectsContainer) return; // Stop if the container is missing
+    console.log("Loading projects..."); // Debugging message
 
-    const projects = await fetchJSON('../lib/projects.json'); // Fetch projects
-    renderProjects(projects, projectsContainer, 'h2'); // Render projects
+    const projectsContainer = document.querySelector('.projects');
+    if (!projectsContainer) {
+        console.error("No .projects container found!");
+        return;
+    }
+
+    try {
+        const projects = await fetchJSON('../lib/projects.json'); // ✅ Correct path to JSON
+        console.log("Fetched projects:", projects);
+
+        if (projects.length === 0) {
+            console.warn("No projects found in JSON!");
+        }
+
+        renderProjects(projects, projectsContainer, 'h2');
+    } catch (error) {
+        console.error("Error fetching projects:", error);
+    }
 }
 
 loadProjects();
