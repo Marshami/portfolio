@@ -149,14 +149,27 @@ function updateSummary(selectedData) {
     const summary = d3.select("#chart")
         .append("div")
         .attr("id", "selected-summary")
-        .style("margin-top", "20px")
-        .html(`<p>${totalSelected} commits selected</p>`);
+        .style("margin-top", "20px");
+
+    summary.append("p").text(`${totalSelected} commits selected`).style("text-align", "center");
+
+    // ✅ Create table for horizontal layout
+    const table = summary.append("div")
+        .attr("class", "summary-table")
+        .style("display", "flex")
+        .style("justify-content", "center")
+        .style("gap", "30px");
 
     typeCounts.forEach(([type, lines]) => {
         const percentage = ((lines / totalLines) * 100).toFixed(1);
-        summary.append("p").html(
-            `<strong>${type.toUpperCase()}</strong><br>${lines} lines<br>(${percentage}%)`
-        );
+
+        const column = table.append("div")
+            .attr("class", "summary-column")
+            .style("text-align", "center");
+
+        column.append("p").html(`<strong>${type.toUpperCase()}</strong>`);
+        column.append("p").text(`${lines} lines`);
+        column.append("p").text(`(${percentage}%)`);
     });
 }
 

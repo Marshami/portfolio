@@ -302,3 +302,24 @@ form button:hover {
 .dark-mode #profile-stats dd {
   color: #000000 !important;
 }
+
+/* ========================= */
+/* META */
+/* ========================= */
+
+.summary-table {
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+  margin-top: 10px;
+}
+
+.summary-column {
+  text-align: center;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.summary-column p {
+  margin: 5px 0;
+}
