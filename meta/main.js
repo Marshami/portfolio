@@ -16,6 +16,7 @@ async function loadData() {
         datetime: new Date(row.datetime),
         line: +row.line,
         type: row.type, // File type (css, js, html)
+        hour: new Date(row.datetime).getHours(), // Extract hour for time-of-day analysis
     }));
 
     console.log("✅ Loaded Data:", data);
@@ -25,14 +26,30 @@ async function loadData() {
 }
 
 // ====================
-// 🚀 Display Summary Stats
+// 🚀 Display Summary Stats (Including Most Active Time of Day)
 // ====================
 function displayStats() {
-    d3.select("#stats").html("");  // ✅ Clear previous stats before appending
-
     const totalCommits = new Set(data.map(d => d.commit)).size;
     const totalLines = d3.sum(data, d => d.line);
-    const avgFileLen = d3.mean(data, d => d.length);
+
+    // ✅ Group commits by time of day
+    const timeCategories = {
+        "Morning": data.filter(d => d.hour >= 6 && d.hour < 12).length,
+        "Afternoon": data.filter(d => d.hour >= 12 && d.hour < 18).length,
+        "Evening": data.filter(d => d.hour >= 18 && d.hour < 24).length,
+        "Night": data.filter(d => d.hour >= 0 && d.hour < 6).length
+    };
+
+    // ✅ Find the time of day with the most commits
+    const mostActiveTime = Object.entries(timeCategories)
+        .reduce((max, entry) => (entry[1] > max[1] ? entry : max), ["None", 0])[0];
+
+    console.log("Debug Stats:");
+    console.log("Total Commits:", totalCommits);
+    console.log("Total LOC:", totalLines);
+    console.log("Most Active Time of Day:", mostActiveTime);
+
+    d3.select("#stats").html(""); // ✅ Clear previous stats
 
     const stats = d3.select("#stats")
         .append("dl")
@@ -44,8 +61,8 @@ function displayStats() {
     stats.append("dt").text("Total Lines of Code (LOC)");
     stats.append("dd").text(totalLines);
 
-    stats.append("dt").text("Average File Length");
-    stats.append("dd").text(avgFileLen.toFixed(2));
+    stats.append("dt").text("Most Active Time of Day");
+    stats.append("dd").text(mostActiveTime);
 
     console.log("✅ Stats Computed & Displayed");
 }
@@ -104,8 +121,8 @@ function createScatterplot() {
         .attr("transform", `translate(0, ${height - margin.bottom})`)
         .call(xAxisGrid)
         .selectAll("line")
-        .style("stroke", "#ddd")  // ✅ Light gray grid lines
-        .style("stroke-opacity", 0.5)  // ✅ Reduce saturation
+        .style("stroke", "#ddd")
+        .style("stroke-opacity", 0.5)
         .style("stroke-width", 0.7);
 
     svg.append("g")
@@ -113,8 +130,8 @@ function createScatterplot() {
         .attr("transform", `translate(${margin.left}, 0)`)
         .call(yAxisGrid)
         .selectAll("line")
-        .style("stroke", "#ddd")  // ✅ Light gray grid lines
-        .style("stroke-opacity", 0.5)  // ✅ Reduce saturation
+        .style("stroke", "#ddd")
+        .style("stroke-opacity", 0.5)
         .style("stroke-width", 0.7);
 
     // Add Axes
@@ -167,45 +184,6 @@ function createScatterplot() {
 
     svg.append("g").call(brush);
     dots.raise();
-}
-
-// ====================
-// 🚀 Update Summary Stats on Selection
-// ====================
-function updateSummary(selectedData) {
-    d3.select("#selected-summary").remove();
-
-    if (selectedData.length === 0) return;
-
-    const totalSelected = selectedData.length;
-    const typeCounts = d3.rollups(selectedData, v => d3.sum(v, d => d.line), d => d.type);
-    const totalLines = d3.sum(selectedData, d => d.line);
-
-    const summary = d3.select("#chart")
-        .append("div")
-        .attr("id", "selected-summary")
-        .style("margin-top", "20px");
-
-    summary.append("p").text(`${totalSelected} commits selected`).style("text-align", "center");
-
-    // ✅ Create table for horizontal layout
-    const table = summary.append("div")
-        .attr("class", "summary-table")
-        .style("display", "flex")
-        .style("justify-content", "center")
-        .style("gap", "30px");
-
-    typeCounts.forEach(([type, lines]) => {
-        const percentage = ((lines / totalLines) * 100).toFixed(1);
-
-        const column = table.append("div")
-            .attr("class", "summary-column")
-            .style("text-align", "center");
-
-        column.append("p").html(`<strong>${type.toUpperCase()}</strong>`);
-        column.append("p").text(`${lines} lines`);
-        column.append("p").text(`(${percentage}%)`);
-    });
 }
 
 // ====================
