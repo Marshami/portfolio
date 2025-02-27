@@ -1,17 +1,3 @@
-export function renderProjects(projects, containerElement) {
-    containerElement.innerHTML = '';  // Clear previous content
-    
-    projects.forEach(project => {
-        const article = document.createElement('article');
-        article.innerHTML = `
-            <h3>${project.title}</h3>
-            <img src="${project.image}" alt="${project.title}">
-            <p>${project.description}</p>
-        `;
-        containerElement.appendChild(article);
-    });
-}
-
 import { fetchJSON, renderProjects } from '../global.js';
 
 async function loadProjects() {

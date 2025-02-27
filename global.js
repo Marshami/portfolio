@@ -137,11 +137,11 @@ export async function fetchJSON(url) {
 
 export function renderProjects(projects, containerElement) {
   containerElement.innerHTML = '';  // Clear previous content
-  
+
   projects.forEach(project => {
       const article = document.createElement('article');
       article.innerHTML = `
-          <h3>${project.title}</h3>
+          <h2>${project.title}</h2>
           <img src="${project.image}" alt="${project.title}">
           <p>${project.description}</p>
       `;
