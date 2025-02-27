@@ -43,7 +43,6 @@ loadProjects();
 // ====================
 
 function renderPieChart(projects) {
-    // ✅ Group projects by year and count occurrences
     let rolledData = d3.rollups(
         projects,
         v => v.length,
@@ -55,35 +54,28 @@ function renderPieChart(projects) {
         label: year
     }));
 
-    console.log("✅ Processed Pie Data:", data);
-
-    // ✅ Fix: Use a consistent color scale based on year labels
     let colorScale = d3.scaleOrdinal(d3.schemeTableau10)
-        .domain(data.map(d => d.label)); // Maps colors to years
+        .domain(data.map(d => d.label));
 
     let pieGenerator = d3.pie().value(d => d.value);
     let arcData = pieGenerator(data);
 
     let arcGenerator = d3.arc()
         .innerRadius(0)
-        .outerRadius(80); // ✅ Ensures slices maintain correct proportions
+        .outerRadius(80);
 
     let svg = d3.select('#projects-pie-plot');
-
     svg.selectAll('*').remove();
 
     svg.selectAll('path')
         .data(arcData)
         .join('path')
         .attr('d', arcGenerator)
-        .attr('fill', d => colorScale(d.data.label)) // ✅ Assigns color by year
+        .attr('fill', d => colorScale(d.data.label))
         .attr('stroke', '#fff')
         .attr('stroke-width', 2)
-        .on('click', (event, d) => filterProjectsByYear(d.data.label));
+        .on('click', (event, d) => filterProjectsByYear(d.data.label)); // ✅ Enables click interactivity
 
-    console.log("✅ Pie chart should now be visible!");
-
-    // ✅ Step 2: Add a Legend
     renderLegend(data, colorScale);
 }
 
@@ -111,12 +103,10 @@ function renderLegend(data, colorScale) {
 // ====================
 
 function filterProjectsByYear(year) {
-    console.log(`✅ Filtering projects by year: ${year}`);
-
-    let filteredProjects = projects.filter(project => project.year === year);
+    let filteredProjects = allProjects.filter(project => project.year === year);
 
     renderProjects(filteredProjects, document.querySelector('.projects'), 'h2');
-    renderPieChart(filteredProjects); // ✅ Ensures pie chart updates dynamically
+    renderPieChart(filteredProjects); // ✅ Updates pie chart with filtered projects
 }
 
 // ====================
@@ -128,13 +118,12 @@ let searchInput = document.querySelector('.searchBar');
 searchInput.addEventListener('input', (event) => {
     let query = event.target.value.toLowerCase();
 
-    // ✅ Filter the projects using `lib/projects.json`
     let filteredProjects = allProjects.filter(project => 
         Object.values(project).join(' ').toLowerCase().includes(query)
     );
 
     renderProjects(filteredProjects, document.querySelector('.projects'), 'h2');
-    renderPieChart(filteredProjects); // ✅ Update pie chart with filtered data
+    renderPieChart(filteredProjects); // ✅ Ensures pie chart updates when searching
 });
 
 // ✅ Load Projects and Render Everything
