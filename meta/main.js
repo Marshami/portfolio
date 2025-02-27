@@ -82,26 +82,34 @@ function createScatterplot() {
 
     console.log("✅ Scales Created");
 
-    // Add Grid Lines
+    // Add Grid Lines (Lighter Appearance)
     const xAxisGrid = d3.axisBottom(xScale)
         .tickSize(-height + margin.top + margin.bottom)
-        .tickFormat("");
+        .tickFormat("")
+        .ticks(10);
 
     const yAxisGrid = d3.axisLeft(yScale)
         .tickSize(-width + margin.left + margin.right)
-        .tickFormat("");
+        .tickFormat("")
+        .ticks(10);
 
     svg.append("g")
         .attr("class", "grid")
         .attr("transform", `translate(0, ${height - margin.bottom})`)
-        .call(xAxisGrid);
+        .call(xAxisGrid)
+        .selectAll("line")
+        .style("stroke", "#ddd")  // ✅ Light gray grid lines
+        .style("stroke-opacity", 0.5)  // ✅ Reduce saturation
+        .style("stroke-width", 0.7);
 
     svg.append("g")
         .attr("class", "grid")
         .attr("transform", `translate(${margin.left}, 0)`)
-        .call(yAxisGrid);
-
-    console.log("✅ Grid Lines Added");
+        .call(yAxisGrid)
+        .selectAll("line")
+        .style("stroke", "#ddd")  // ✅ Light gray grid lines
+        .style("stroke-opacity", 0.5)  // ✅ Reduce saturation
+        .style("stroke-width", 0.7);
 
     // Add Axes
     svg.append("g")
