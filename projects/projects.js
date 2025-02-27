@@ -54,60 +54,53 @@ function renderPieChart(projects) {
 
     console.log("✅ Processed Pie Data:", data);
 
-    // ✅ Create Pie Generator (Computes startAngle & endAngle for each slice)
+    // ✅ Fix: Use a consistent color scale based on year labels
+    let colorScale = d3.scaleOrdinal(d3.schemeTableau10)
+        .domain(data.map(d => d.label)); // Maps colors to years
+
     let pieGenerator = d3.pie().value(d => d.value);
-    let arcData = pieGenerator(data);  // ✅ Generates multiple slices
+    let arcData = pieGenerator(data);
 
-    // ✅ Create an Arc Generator (Defines how slices are drawn)
     let arcGenerator = d3.arc()
-    .innerRadius(0)  // Keeps it a pie chart (not a donut)
-    .outerRadius(80); // Increase size of slices to match the second image
+        .innerRadius(0)
+        .outerRadius(80); // ✅ Ensures slices maintain correct proportions
 
-    // ✅ D3 Color Scale to Assign Different Colors
-    let colors = d3.scaleOrdinal(d3.schemeTableau10);
-
-    // ✅ Select the `<svg>` container
     let svg = d3.select('#projects-pie-plot');
 
-    console.log("✅ Selected SVG:", svg);
-
-    // ✅ Clear old chart
     svg.selectAll('*').remove();
 
-    // ✅ Bind `arcData` to `path` elements and create pie slices
     svg.selectAll('path')
         .data(arcData)
         .join('path')
-        .attr('d', arcGenerator) // ✅ Generates correct arc for each slice
-        .attr('fill', (d, i) => colors(i)) // ✅ Assigns a different color to each slice
+        .attr('d', arcGenerator)
+        .attr('fill', d => colorScale(d.data.label)) // ✅ Assigns color by year
         .attr('stroke', '#fff')
         .attr('stroke-width', 2)
-        .on('click', (event, d) => filterProjectsByYear(d.data.label)); // ✅ Step 5: Click to filter projects
+        .on('click', (event, d) => filterProjectsByYear(d.data.label));
 
     console.log("✅ Pie chart should now be visible!");
 
     // ✅ Step 2: Add a Legend
-    renderLegend(data, colors);
+    renderLegend(data, colorScale);
 }
 
 // ====================
 // 🎯 Step 2: Add a Legend
 // ====================
 
-function renderLegend(data, colors) {
+function renderLegend(data, colorScale) {
     let legend = d3.select('.legend');
 
-    // ✅ Clear old legend
     legend.selectAll('*').remove();
 
-    // ✅ Create legend items dynamically
     legend.selectAll('li')
         .data(data)
         .join('li')
         .html(d => `
-            <span class="swatch" style="background:${colors(d.label)}"></span> 
+            <span class="swatch" style="background:${colorScale(d.label)}"></span> 
             ${d.label} <em>(${d.value})</em>
-        `);
+        `)
+        .on('click', (event, d) => filterProjectsByYear(d.label)); // ✅ Allows filtering by clicking legend
 }
 
 // ====================
@@ -120,6 +113,7 @@ function filterProjectsByYear(year) {
     let filteredProjects = projects.filter(project => project.year === year);
 
     renderProjects(filteredProjects, document.querySelector('.projects'), 'h2');
+    renderPieChart(filteredProjects); // ✅ Ensures pie chart updates dynamically
 }
 
 // ====================
