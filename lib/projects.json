@@ -18,10 +18,10 @@
         "description": "The Nambu-kai Interactive Mouse Heatmap visualizes 14-day temperature data for multiple mice. Each row is a mouse, each column is a time bin (every 20 min), and colors represent avg. temp. Features include zooming, toggling mice, and tooltips. Built with D3 using an orange heat scale."
     },
     {
-        "title": "Maiores cum mollitia repellendus?",
-        "year": "TBA",
-        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
-        "description": "Natus cum tempore assumenda ex tempora facere rerum totam! Incidunt saepe blanditiis repellendus dolores dolorum error porro nisi cupiditate consequatur inventore officia dignissimos ipsam aspernatur, ut sit explicabo natus possimus!"
+        "title": "Bikewatching",
+        "year": "2025",
+        "image": "images/lab7.jpg",
+        "description": "Embedded a Mapbox map, added Boston/Cambridge bike lanes, fetched station & trip data, overlaid an SVG with D3 circles sized by total traffic and color-coded for arrivals/departures ratio. A time slider filters data for a dynamic geospatial visualization."
     },
     {
         "title": "Minima illum accusamus corporis?",
