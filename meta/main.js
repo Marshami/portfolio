@@ -145,14 +145,31 @@ function renderItems(startIndex) {
       // earliest commit => "his first commit"
       const desc = (globalIndex === 0) ? "his first commit" : "another commit";
 
+      // Add a data attribute with commit ID, remove 'target="_blank"', etc.
       return `
         <p>
           On ${dtString}, ${commit.author} made 
-          <a href="#" target="_blank">${desc}</a>.<br/>
+          <a href="#" 
+             class="commit-link"
+             data-commit="${commit.commit}"
+          >${desc}</a>.<br/>
           He edited ${totalLines} lines across ${fileCount} files.
         </p>
       `;
     });
+
+  // Attach click listener to the new links => highlight circle
+  d3.selectAll(".commit-link").on("click", (evt) => {
+    evt.preventDefault(); // don't navigate
+    // get the commit ID from the link
+    const commitID = evt.currentTarget.dataset.commit;
+
+    // highlight the matching circle
+    // revert all circles, if you like:
+    d3.selectAll("circle").attr("fill", "steelblue").attr("fill-opacity", 0.7);
+    // highlight one
+    d3.select(`#circle-${commitID}`).attr("fill", "red").attr("fill-opacity", 1);
+  });
 
   // Now update the chart for just that chunk
   updateScatterplot(slice);
@@ -247,6 +264,8 @@ function updateScatterplot(visibleCommits) {
   svg.selectAll("circle")
     .data(visibleCommits)
     .join("circle")
+    // give each circle an ID for highlighting
+    .attr("id", d => `circle-${d.commit}`)
     .attr("cx", d => xScale(d.date))
     .attr("cy", d => yScale(d.date.getHours()))
     .attr("r", d => rScale(getTotalLines(d)))
