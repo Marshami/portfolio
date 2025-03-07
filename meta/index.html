@@ -3,61 +3,46 @@
 <head>
   <meta charset="UTF-8" />
   <title>Codebase Analysis</title>
-
-  <!-- Original CSS -->
+  <!-- Link to your global stylesheet (already in /portfolio/style.css presumably) -->
   <link rel="stylesheet" href="../style.css" />
 
-  <!-- D3 & JS -->
+  <!-- D3 + the main script for this page -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="main.js" defer></script>
-  <script src="../global.js" type="module"></script> <!-- your global nav, if needed -->
+  
+  <!-- If you have a global.js for your nav bar, keep it here: -->
+  <script src="../global.js" type="module"></script>
 </head>
 <body>
   <h1>Codebase Analysis</h1>
-
-  <!-- Existing Stats Section -->
-  <div id="stats"></div>
-
-  <!-- Existing Scatter Plot Section -->
+  <!-- 
+    Headline area: "Commits by Time of Day" 
+    (We’ll insert an SVG here in main.js)
+  -->
   <h2>Commits by Time of Day</h2>
   <div id="chart"></div>
 
-  <!-- Tooltip from your older code (unchanged) -->
-  <dl id="commit-tooltip" class="info tooltip" hidden>
-    <dt>Commit:</dt> <dd><a href="" id="commit-link" target="_blank"></a></dd>
-    <dt>Date:</dt> <dd id="commit-date"></dd>
-    <dt>Time:</dt> <dd id="commit-time"></dd>
-    <dt>Author:</dt> <dd id="commit-author"></dd>
-    <dt>Lines Edited:</dt> <dd id="commit-lines"></dd>
-  </dl>
-
-  <!-- 
-    ================================================
-    LAB 8: SCROLLYTELLING BLOCK (PINNED CHART STYLE)
-    ================================================
-  -->
-  <div id="scrolly-layout">
-    <!-- The pinned chart area (optional: you can reuse #chart if you want to swap the above one out) -->
-    <div id="pinned-chart-container">
-      <div id="pinned-chart"></div>
-    </div>
-
-    <!-- The scrolling text area -->
-    <div id="text-scroller">
-      <div id="scroll-narrative">
-        <div id="scroll-spacer"></div>
-        <div id="scroll-steps"></div>
-      </div>
-    </div>
-  </div>
-
   <hr />
 
-  <!-- 
-    LAB 8: FILE-SIZE VISUALIZATION 
-    (The “race” or unit chart portion)
-  -->
+  <!-- File size area for “race” chart (unit chart) -->
   <h2>File Sizes Over Time</h2>
   <dl class="files"></dl>
+
+  <!-- 
+    ================ 
+    Lab 8: Evolution Narrative
+    ================
+    We’ll display a list of commits in text form, as an “Evolution Over Time.”
+  -->
+  <h2>Evolution Over Time</h2>
+  <div id="narrative"></div>
+
+  <!-- 
+    OPTIONAL: If you want to show summary stats at the top 
+    (like “Commits: X, Files: Y, Total LOC: Z, …”), 
+    you can add a container for them:
+  -->
+  <div id="stats" style="margin-top: 2rem;"></div>
+
 </body>
 </html>

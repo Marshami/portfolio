@@ -1,259 +1,283 @@
-console.log("✅ D3 script is running...");
+console.log("Lab 8 main.js loaded");
 
-// ===============
-// GLOBALS
-// ===============
-let data = [];
-let commits = [];
+// ==========================
+// 1) MOCK DATA (for demo)
+// ==========================
+// If you have your actual CSV, you can skip this array 
+// and do something like:
+//   let data = [];
+//   async function loadData() {
+//     data = await d3.csv("loc.csv");
+//     ...
+//   }
+let commits = [
+  {
+    date: new Date("2024-04-11T09:22"),
+    message: "my first commit, and it was glorious",
+    lines: [
+      { file: "src/app.html", type: "html" },
+      { file: "src/lib/index.js", type: "js" },
+      // etc. you can replicate lines to show bigger files
+    ]
+  },
+  {
+    date: new Date("2024-04-10T20:17"),
+    message: "another glorious commit",
+    lines: [
+      { file: "src/routes/contact/+page.svelte", type: "svelte" },
+      { file: "src/routes/contact/+page.svelte", type: "svelte" },
+      { file: "src/app.html", type: "html" },
+    ]
+  },
+  {
+    date: new Date("2024-03-11T11:14"),
+    message: "another glorious commit",
+    lines: [
+      { file: "src/routes/projects/+page.svelte", type: "svelte" },
+    ]
+  },
+  {
+    date: new Date("2024-02-26T01:33"),
+    message: "another glorious commit",
+    lines: [
+      { file: "src/routes/projects/+page.svelte", type: "svelte" },
+      { file: "src/lib/Project.svelte", type: "svelte" },
+      { file: "src/app.html", type: "html" },
+      { file: "src/lib/index.js", type: "js" },
+      { file: "src/lib/index.js", type: "js" },
+    ]
+  },
+  {
+    date: new Date("2024-03-04T10:35"),
+    message: "another glorious commit",
+    lines: [
+      { file: "src/app.html", type: "html" },
+      { file: "src/app.html", type: "html" },
+      { file: "src/app.html", type: "html" },
+    ]
+  },
+  {
+    date: new Date("2024-03-21T01:38"),
+    message: "another glorious commit",
+    lines: [
+      { file: "src/lib/Project.svelte", type: "svelte" },
+      { file: "src/lib/Project.svelte", type: "svelte" },
+    ]
+  },
+  {
+    date: new Date("2024-03-12T13:11"),
+    message: "another glorious commit",
+    lines: [
+      { file: "src/lib/Project.svelte", type: "svelte" },
+      { file: "src/lib/index.js", type: "js" },
+    ]
+  },
+  {
+    date: new Date("2024-02-27T19:56"),
+    message: "another glorious commit",
+    lines: [
+      { file: "src/app.html", type: "html" },
+      { file: "src/lib/Project.svelte", type: "svelte" },
+      { file: "src/lib/index.js", type: "js" },
+    ]
+  },
+];
 
-// For pinned scrollytelling:
-let SCROLL_ITEM_HEIGHT = 180;   // each “step” is 180px tall
-let VISIBLE_STEPS = 6;         // how many steps we render at once
-let scrollContainer, spacer, stepsContainer;
+// ==========================
+// 2) On DOM Load: Boot Up
+// ==========================
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("IT'S ALIVE!");
 
-// ===============
-// Load Data
-// ===============
-async function loadData() {
-  data = await d3.csv("loc.csv", (row) => ({
-    commit: row.commit,
-    author: row.author,
-    file: row.file,
-    date: new Date(row.date + "T00:00" + row.timezone),
-    datetime: new Date(row.datetime),
-    line: +row.line,
-    type: row.type,
-    hour: new Date(row.datetime).getHours(),
-  }));
+  // Sort commits descending by date, so newest first:
+  commits.sort((a, b) => b.date - a.date);
 
-  // Group rows by commit so we can easily display scrollytelling for each commit
-  const grouped = d3.groups(data, d => d.commit)
-    .map(([commitId, rows]) => {
-      const first = rows[0];
-      return {
-        commit: commitId,
-        author: first.author,
-        datetime: first.datetime,
-        totalLines: d3.sum(rows, r => r.line),
-        lines: rows.map(r => ({
-          file: r.file,
-          type: r.type,
-          lineCount: r.line
-        })),
-        hour: first.hour,
-      };
-    });
+  // Build the chart
+  createScatterplot(commits);
 
-  // Sort commits by date ascending
-  grouped.sort((a, b) => a.datetime - b.datetime);
-  commits = grouped;
-
-  console.log("✅ Loaded Data:", data);
-  console.log("✅ Aggregated commits:", commits);
-
-  // Now initialize your existing stuff
-  displayStats();
-  createScatterplot(); // your original chart
-  setupPinnedChart();   // sets up a second pinned chart or reuses the same data
-  initScrollytelling(); // sets up the scrollytelling on the right
-  renderSteps(0);       // draw the first steps
-
-  // Initialize file-size race
+  // Build the file-size “unit chart”
   displayCommitFiles(commits);
-}
 
-// ===============
-// Original Display Stats
-// ===============
-function displayStats() {
-  // (unchanged from your code)
-  const totalCommits = new Set(data.map(d => d.commit)).size;
-  const totalLines = d3.sum(data, d => d.line);
+  // Build the textual narrative
+  buildNarrative(commits);
 
-  const timeCategories = {
-    "Morning": data.filter(d => d.hour >= 6 && d.hour < 12).length,
-    "Afternoon": data.filter(d => d.hour >= 12 && d.hour < 18).length,
-    "Evening": data.filter(d => d.hour >= 18 && d.hour < 24).length,
-    "Night": data.filter(d => d.hour >= 0 && d.hour < 6).length
-  };
+  // Optionally, display summary stats
+  displayStats(commits);
+});
 
-  const mostActiveTime = Object.entries(timeCategories)
-    .reduce((max, e) => (e[1] > max[1] ? e : max), ["None",0])[0];
+// ==========================
+// 3) Create Scatterplot
+// ==========================
+function createScatterplot(commitArray) {
+  const container = d3.select("#chart");
+  container.selectAll("svg").remove(); // clear old
 
-  d3.select("#stats").html("");
-  const dl = d3.select("#stats").append("dl").attr("class","stats");
-  dl.append("dt").text("Total Commits");     dl.append("dd").text(totalCommits);
-  dl.append("dt").text("Total Lines of Code"); dl.append("dd").text(totalLines);
-  dl.append("dt").text("Most Active Time");  dl.append("dd").text(mostActiveTime);
+  const width = 600,
+    height = 300,
+    margin = { top: 20, right: 20, bottom: 40, left: 40 };
 
-  console.log("✅ Stats displayed");
-}
-
-// ===============
-// Original createScatterplot
-// (this is the big chart in #chart up top)
-// ===============
-function createScatterplot() {
-  // (unchanged from your code)
-  if(!data.length) return;
-
-  d3.select("#chart").selectAll("svg").remove();
-
-  const width = 1000, height = 600;
-  const margin = { top: 20, right: 30, bottom: 40, left: 50 };
-
-  const svg = d3.select("#chart")
+  const svg = container
     .append("svg")
-    .attr("viewBox", `0 0 ${width} ${height}`);
-
-  const xScale = d3.scaleTime()
-    .domain(d3.extent(data, d => d.datetime))
-    .range([margin.left, width - margin.right]);
-
-  const yScale = d3.scaleLinear()
-    .domain([0, 24])
-    .range([height - margin.bottom, margin.top]);
-
-  const rScale = d3.scaleSqrt()
-    .domain(d3.extent(data, d => d.line))
-    .range([3, 25]);
-
-  // Axis
-  svg.append("g")
-     .attr("transform", `translate(0, ${height - margin.bottom})`)
-     .call(d3.axisBottom(xScale).tickFormat(d3.timeFormat("%b %d")));
-
-  svg.append("g")
-     .attr("transform", `translate(${margin.left},0)`)
-     .call(d3.axisLeft(yScale).tickFormat(d => d + ":00"));
-
-  // Plot
-  svg.selectAll("circle")
-    .data(data)
-    .join("circle")
-    .attr("cx", d => xScale(d.datetime))
-    .attr("cy", d => yScale(d.hour))
-    .attr("r", d => rScale(d.line))
-    .attr("fill", "steelblue")
-    .attr("fill-opacity", 0.7);
-
-  console.log("✅ Scatterplot created");
-}
-
-// ===============
-// LAB 8: SET UP PINNED CHART
-// ===============
-function setupPinnedChart() {
-  // If you want a second chart in #pinned-chart, do it here:
-  // For instance, just copy the logic from createScatterplot
-  // or do something simpler.
-
-  const container = d3.select("#pinned-chart");
-  container.selectAll("svg").remove();
-
-  const width = 400, height = 400;
-  const svg = container.append("svg")
     .attr("width", width)
     .attr("height", height);
 
-  // Just a placeholder “pinned chart”:
-  svg.append("text")
-    .attr("x", width/2)
-    .attr("y", height/2)
-    .attr("text-anchor","middle")
-    .style("font-size","18px")
-    .text("Pinned Chart Here");
+  // We'll map commits to their “time of day” (date.getHours()) vs. their date
+  // But for demonstration, let's just do "index" on x-axis vs. hour on y-axis
+  // or we can do date on x-axis. Up to you. We'll do date on x.
+  const xScale = d3
+    .scaleTime()
+    .domain(d3.extent(commitArray, d => d.date))
+    .range([margin.left, width - margin.right]);
+
+  // hour of day
+  const yScale = d3
+    .scaleLinear()
+    .domain([0, 24])
+    .range([height - margin.bottom, margin.top]);
+
+  // radius = # lines in each commit
+  const rScale = d3
+    .scaleSqrt()
+    .domain([0, d3.max(commitArray, d => d.lines.length)])
+    .range([3, 15]);
+
+  // x Axis
+  const xAxis = d3.axisBottom(xScale).ticks(5);
+  svg
+    .append("g")
+    .attr("transform", `translate(0,${height - margin.bottom})`)
+    .call(xAxis);
+
+  // y Axis
+  const yAxis = d3.axisLeft(yScale).ticks(5);
+  svg
+    .append("g")
+    .attr("transform", `translate(${margin.left},0)`)
+    .call(yAxis);
+
+  // circles
+  svg
+    .selectAll("circle.commit-dot")
+    .data(commitArray)
+    .join("circle")
+    .attr("class", "commit-dot")
+    .attr("cx", d => xScale(d.date))
+    .attr("cy", d => {
+      const hour = d.date.getHours();
+      return yScale(hour);
+    })
+    .attr("r", d => rScale(d.lines.length))
+    .attr("fill", "steelblue")
+    .attr("fill-opacity", 0.7);
+
+  console.log("✅ Scatterplot created with", commitArray.length, "commits");
 }
 
-// ===============
-// LAB 8: SCROLLYTELLING SETUP
-// ===============
-function initScrollytelling() {
-  scrollContainer = d3.select("#scroll-narrative");
-  spacer = d3.select("#scroll-spacer");
-  stepsContainer = d3.select("#scroll-steps");
-
-  // total items = commits
-  const numCommits = commits.length;
-  const totalHeight = Math.max(0, (numCommits - 1) * SCROLL_ITEM_HEIGHT);
-  spacer.style("height", totalHeight + "px");
-
-  scrollContainer.on("scroll", () => {
-    const scrollTop = scrollContainer.property("scrollTop");
-    let startIndex = Math.floor(scrollTop / SCROLL_ITEM_HEIGHT);
-    startIndex = Math.max(0, Math.min(startIndex, numCommits - VISIBLE_STEPS));
-    renderSteps(startIndex);
+// ==========================
+// 4) Display File Size “Unit Chart”
+// ==========================
+function displayCommitFiles(commitArray) {
+  // Flatten all lines from all commits
+  let allLines = [];
+  commitArray.forEach(c => {
+    // each c.lines is an array of { file, type }
+    allLines.push(...c.lines);
   });
-}
-
-function renderSteps(startIndex) {
-  stepsContainer.selectAll("div.step").remove();
-
-  const endIndex = Math.min(startIndex + VISIBLE_STEPS, commits.length);
-  const slice = commits.slice(startIndex, endIndex);
-
-  stepsContainer.selectAll("div.step")
-    .data(slice)
-    .join("div")
-    .attr("class", "step")
-    .style("top", (_, i) => `${i * SCROLL_ITEM_HEIGHT}px`)
-    .style("height", SCROLL_ITEM_HEIGHT + "px")
-    .html(d => {
-      const dt = d.datetime.toLocaleString();
-      return `
-        <h3>Commit: ${d.commit}</h3>
-        <p>Date/Time: ${dt}</p>
-        <p>Total lines edited: ${d.totalLines}</p>
-        <p>By: ${d.author}</p>
-      `;
-    });
-
-  // If you want to highlight or filter the pinned chart by these commits, you can do so here:
-  // highlightPinnedChart(slice);
-}
-
-// ===============
-// LAB 8: FILE SIZE RACE
-// ===============
-function displayCommitFiles(someCommits) {
-  // Flatten lines
-  const allLines = someCommits.flatMap(c => c.lines);
 
   // Group by file
   let files = d3.groups(allLines, d => d.file).map(([file, lines]) => ({
     file,
-    lines
+    lines,
   }));
 
-  // Sort descending
-  files.sort((a,b) => b.lines.length - a.lines.length);
+  // Sort descending by # lines
+  files.sort((a, b) => b.lines.length - a.lines.length);
 
   // Clear
   d3.select(".files").selectAll("div").remove();
 
-  const fileDivs = d3.select(".files")
+  // Rebind
+  const fileDivs = d3
+    .select(".files")
     .selectAll("div")
     .data(files)
     .join("div");
 
-  fileDivs.append("dt")
+  // dt: show file name & line count
+  fileDivs
+    .append("dt")
     .html(d => `<code>${d.file}</code> <small>${d.lines.length} lines</small>`);
 
-  fileDivs.append("dd")
+  // dd: unit dots
+  fileDivs
+    .append("dd")
     .selectAll("div.line")
     .data(d => d.lines)
     .join("div")
-    .attr("class","line")
-    .style("background", d => {
-      // color by type
-      if (d.type === "js") return "#ff7f0e";
-      if (d.type === "css") return "#1f77b4";
-      if (d.type === "html") return "#2ca02c";
+    .attr("class", "line")
+    .style("background", line => {
+      // color by file type or something if you want
+      if (line.type === "html") return "orange";
+      if (line.type === "js") return "red";
+      if (line.type === "svelte") return "#ff6600";
       return "gray";
     });
 }
 
-// ===============
-// DOM Ready
-// ===============
-document.addEventListener("DOMContentLoaded", loadData);
+// ==========================
+// 5) Build “Evolution Over Time” Narrative
+// ==========================
+function buildNarrative(commitArray) {
+  const narrative = d3.select("#narrative");
+  narrative.html(""); // clear
+
+  commitArray.forEach((commit, i) => {
+    const dtString = commit.date.toLocaleString(undefined, {
+      dateStyle: "full",
+      timeStyle: "short",
+    });
+
+    // Count how many unique files (like “6 files”):
+    const uniqueFiles = new Set(commit.lines.map(d => d.file));
+    // total lines is just array length:
+    const totalLines = commit.lines.length;
+
+    // build a short paragraph
+    const p = narrative.append("p");
+
+    // “On Thursday, April 11, 2024 at 9:22 AM, I made my first commit... etc.”
+    p.html(`
+      On ${dtString}, I made <a href="#" target="_blank">
+      ${i === 0 ? "my first commit, and it was glorious" : "another glorious commit"}
+      </a>. I edited ${totalLines} lines across ${uniqueFiles.size} files. 
+      Then I looked over all I had made, and I saw that it was very good.
+    `);
+  });
+}
+
+// ==========================
+// 6) Optional: Display Summary Stats
+// ==========================
+function displayStats(commitArray) {
+  const statsBox = d3.select("#stats");
+  statsBox.html("");
+
+  const totalCommits = commitArray.length;
+
+  // unique files
+  let fileSet = new Set();
+  commitArray.forEach(c => {
+    c.lines.forEach(line => fileSet.add(line.file));
+  });
+  const totalFiles = fileSet.size;
+
+  // total lines is the sum of all lines
+  const totalLOC = d3.sum(commitArray, c => c.lines.length);
+
+  // Now, just show them in an inline list:
+  statsBox.append("p").html(`
+    <strong>COMMITS</strong> ${totalCommits} &nbsp;
+    <strong>FILES</strong> ${totalFiles} &nbsp;
+    <strong>TOTAL LOC</strong> ${totalLOC}
+  `);
+}
