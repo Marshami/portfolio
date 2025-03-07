@@ -176,15 +176,14 @@ function buildNarrative(commitArray) {
     // If i=0, label as “my first commit”
     const isFirst = (i === 0);
     const commitDesc = isFirst
-      ? "my first commit, and it was glorious"
-      : "another glorious commit";
+      ? "his first commit"
+      : "another commit";
 
     const p = container.append("p");
     p.html(`
-      On ${dtString}, I made 
+      On ${dtString}, Takumi made 
       <a href="#" target="_blank">${commitDesc}</a>.
-      I edited ${totalLines} lines across ${fileCount} files.
-      Then I looked over all I had made, and I saw that it was very good.
+      He edited ${totalLines} lines across ${fileCount} files.
     `);
   });
 }
