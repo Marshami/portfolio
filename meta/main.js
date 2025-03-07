@@ -1,4 +1,4 @@
-console.log("Lab 8 main.js loaded - scrollytelling with actual min–max date");
+console.log("Lab 8 main.js loaded - scrollytelling with actual min–max date + tooltips");
 
 /** GLOBAL VARIABLES **/
 // All commits after grouping
@@ -13,11 +13,11 @@ let VISIBLE_COUNT = 10;
 // We'll define references after DOM load
 let scrollContainer;
 
-/**
- * ON DOM READY:
- *  1) Load loc.csv
- *  2) Initialize scroller
- *  3) Render from the top (startIndex=0)
+/** 
+ * On DOM READY:
+ *   1) Load loc.csv
+ *   2) Initialize scroller
+ *   3) Render from the top (startIndex=0)
  */
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("IT’S ALIVE!");
@@ -231,6 +231,14 @@ function updateScatterplot(visibleCommits) {
     .domain([minLines || 0, maxLines || 1])
     .range([3, 25]);
 
+  // ================ TOOLTIP SETUP ================
+  // We'll create a tooltip div (if it doesn't exist yet)
+  const tooltip = d3.select("body").selectAll(".tooltip")
+    .data([null])  // a trick to create if not exist
+    .join("div")
+    .attr("class", "tooltip")
+    .style("display", "none"); // hidden by default
+
   // Circles => each commit in slice
   svg.selectAll("circle")
     .data(visibleCommits)
@@ -239,7 +247,30 @@ function updateScatterplot(visibleCommits) {
     .attr("cy", d => yScale(d.date.getHours()))
     .attr("r", d => rScale(getTotalLines(d)))
     .attr("fill", "steelblue")
-    .attr("fill-opacity", 0.7);
+    .attr("fill-opacity", 0.7)
+    .on("mouseenter", (event, d) => {
+      // Fill the tooltip with commit details
+      tooltip.html(`
+        <dl>
+          <dt>COMMIT</dt><dd>${d.commit}</dd>
+          <dt>DATE</dt><dd>${d.date.toLocaleDateString(undefined, { dateStyle: 'full' })}</dd>
+          <dt>TIME</dt><dd>${d.date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit'})}</dd>
+          <dt>AUTHOR</dt><dd>${d.author}</dd>
+          <dt>LINES EDITED</dt><dd>${getTotalLines(d)}</dd>
+        </dl>
+      `);
+      tooltip.style("display", "block");
+    })
+    .on("mousemove", (event) => {
+      // position the tooltip near the cursor
+      tooltip
+        .style("left", (event.pageX + 10) + "px")
+        .style("top",  (event.pageY + 10) + "px");
+    })
+    .on("mouseleave", () => {
+      // hide tooltip
+      tooltip.style("display", "none");
+    });
 
   console.log(
     `Scatter updated for ${visibleCommits.length} commits, domain=`,
