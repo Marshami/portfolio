@@ -1,31 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Codebase Analysis</title>
-    <link rel="stylesheet" href="../style.css">
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="main.js" defer></script>
-    <script src="../global.js" type="module"></script> <!-- ✅ Add Global Navigation -->
+  <meta charset="UTF-8" />
+  <title>Lab 8 – Meta Analysis</title>
+  <link rel="stylesheet" href="../style.css" />
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="main.js" defer></script>
 </head>
 <body>
-    <h1>Codebase Analysis</h1>
-    
-    <!-- Summary Stats -->
-    <div id="stats"></div>
+  <h1>Lab 8: Animation &amp; Scrollytelling</h1>
 
-    <!-- Scatter Plot -->
-    <h2>Commits by Time of Day</h2>
-    <div id="chart"></div>
+  <!-- 
+    Scrollytelling container #1 
+    (commits timeline on the right, text on the left)
+  -->
+  <div id="scrollytelling-commits">
+    <div id="scroll-container-commits">
+      <div id="spacer-commits"></div>
+      <div id="items-container-commits"></div>
+    </div>
+    <div id="chart-commits"></div>
+  </div>
 
-    <!-- Tooltip for commit details -->
-    <dl id="commit-tooltip" class="info tooltip" hidden>
-        <dt>Commit:</dt> <dd><a href="" id="commit-link" target="_blank"></a></dd>
-        <dt>Date:</dt> <dd id="commit-date"></dd>
-        <dt>Time:</dt> <dd id="commit-time"></dd>
-        <dt>Author:</dt> <dd id="commit-author"></dd>
-        <dt>Lines Edited:</dt> <dd id="commit-lines"></dd>
-    </dl>
+  <hr />
+
+  <!-- 
+    Section for file-based analysis (the "race" for largest file).
+    We'll do a second scrollytelling approach or at least a second container 
+    that triggers changes to our file chart (unit viz).
+  -->
+  <h2>File Sizes (Unit Visualization)</h2>
+  <div class="files"></div>
+
+  <div id="scrollytelling-files">
+    <div id="scroll-container-files">
+      <div id="spacer-files"></div>
+      <div id="items-container-files"></div>
+    </div>
+    <!-- You might also place a separate chart or just rely on your .files container. -->
+  </div>
+
 </body>
 </html>
