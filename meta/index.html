@@ -4,28 +4,33 @@
   <meta charset="UTF-8" />
   <title>Codebase Evolution</title>
 
-  <!-- Link your main stylesheet -->
-  <link rel="stylesheet" href="style.css">
+  <!-- (1) Global portfolio stylesheet for nav bar, fonts, etc. -->
+  <link rel="stylesheet" href="../style.css" />
 
-  <!-- D3 + your main script -->
+  <!-- (2) Local scrollytelling styles for THIS meta page -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- (3) Scripts: D3, main.js, optional global nav -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="main.js" defer></script>
-
-  <!-- (Optional) If you have a global navigation or other script: -->
   <script src="../global.js" type="module"></script>
 </head>
 <body>
 
-  <!-- Heading for your chart -->
+  <!-- HEADINGS / NAV / ETC. above the scrollytelling container -->
+
   <h2>Commits by Time of Day</h2>
 
-  <!-- TWO-COLUMN LAYOUT:
-       left = scrollable commits, right = chart -->
+  <!--
+    TWO-COLUMN LAYOUT
+    Left side = scrollable container (all commits)
+    Right side = D3 chart
+  -->
   <div id="scrollytelling">
-    <!-- Left side: scroll-container for all commit paragraphs -->
+    <!-- Left: scroll container -->
     <div id="scroll-container"></div>
 
-    <!-- Right side: chart created by main.js -->
+    <!-- Right: chart -->
     <div id="chart"></div>
   </div>
 
