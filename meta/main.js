@@ -145,11 +145,11 @@ function renderItems(startIndex) {
       // earliest commit => "his first commit"
       const desc = (globalIndex === 0) ? "his first commit" : "another commit";
 
-      // Add a data attribute with commit ID, remove 'target="_blank"', etc.
+      // ADD data-commit attribute; remove target="_blank"
       return `
         <p>
           On ${dtString}, ${commit.author} made 
-          <a href="#" 
+          <a href="#"
              class="commit-link"
              data-commit="${commit.commit}"
           >${desc}</a>.<br/>
@@ -158,17 +158,18 @@ function renderItems(startIndex) {
       `;
     });
 
-  // Attach click listener to the new links => highlight circle
+  // Attach click listener to highlight the circle + show tooltip
   d3.selectAll(".commit-link").on("click", (evt) => {
-    evt.preventDefault(); // don't navigate
-    // get the commit ID from the link
+    evt.preventDefault(); // don't open a page
     const commitID = evt.currentTarget.dataset.commit;
 
-    // highlight the matching circle
-    // revert all circles, if you like:
-    d3.selectAll("circle").attr("fill", "steelblue").attr("fill-opacity", 0.7);
-    // highlight one
-    d3.select(`#circle-${commitID}`).attr("fill", "red").attr("fill-opacity", 1);
+    // find that circle & dispatch "mouseenter" so it acts like a hover
+    const circleEl = document.getElementById("circle-" + commitID);
+    if (circleEl) {
+      // Force the circle to do a "mouseenter" so it turns red & shows tooltip
+      const e = new MouseEvent("mouseenter", { bubbles: true });
+      circleEl.dispatchEvent(e);
+    }
   });
 
   // Now update the chart for just that chunk
@@ -264,7 +265,7 @@ function updateScatterplot(visibleCommits) {
   svg.selectAll("circle")
     .data(visibleCommits)
     .join("circle")
-    // give each circle an ID for highlighting
+    // give each circle an id => "circle-<commitID>"
     .attr("id", d => `circle-${d.commit}`)
     .attr("cx", d => xScale(d.date))
     .attr("cy", d => yScale(d.date.getHours()))
@@ -296,7 +297,6 @@ function updateScatterplot(visibleCommits) {
     .on("mouseleave", (event) => {
       // revert color
       d3.select(event.currentTarget).attr("fill", "steelblue");
-
       // hide tooltip
       tooltip.style("display", "none");
     });
