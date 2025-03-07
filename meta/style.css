@@ -31,7 +31,7 @@ body {
     padding: 0.5rem;
   }
   
-  /* The chart container on the right has no special styling by default. */
+  /* #chart is the container on the right */
   #chart {
     /* e.g. you could do: min-height: 400px; border: 1px dashed #ccc; */
   }
@@ -44,5 +44,4 @@ body {
     stroke: #333;
     stroke-width: 2px;
     fill-opacity: 1;
-  }
-  
+  }  

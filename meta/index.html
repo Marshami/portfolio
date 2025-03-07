@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <title>Codebase Evolution</title>
 
+  <!-- Provide a tiny data-URL icon to avoid 404 on /favicon.ico -->
+  <link rel="icon" href="data:;base64,iVBORw0KGgo=" />
+
   <!-- (1) Global portfolio stylesheet for nav bar, fonts, etc. -->
   <link rel="stylesheet" href="../style.css" />
 
@@ -18,19 +21,18 @@
 <body>
 
   <!-- HEADINGS / NAV / ETC. above the scrollytelling container -->
-
   <h2>Commits by Time of Day</h2>
 
   <!--
     TWO-COLUMN LAYOUT
-    Left side = scrollable container (all commits)
-    Right side = D3 chart
+    Left side = scroll container (with commits)
+    Right side = chart
   -->
   <div id="scrollytelling">
-    <!-- Left: scroll container -->
+    <!-- Left side: scroll container -->
     <div id="scroll-container"></div>
 
-    <!-- Right: chart -->
+    <!-- Right side: chart area -->
     <div id="chart"></div>
   </div>
 
