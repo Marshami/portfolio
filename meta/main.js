@@ -1,4 +1,4 @@
-console.log("Lab 8 main.js loaded - scrollytelling with actual min–max date + tooltips");
+console.log("Lab 8 main.js loaded - scrollytelling + tooltips + summary");
 
 /** GLOBAL VARIABLES **/
 // All commits after grouping
@@ -18,12 +18,16 @@ let scrollContainer;
  *   1) Load loc.csv
  *   2) Initialize scroller
  *   3) Render from the top (startIndex=0)
+ *   4) Display summary info
  */
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("IT’S ALIVE!");
   await loadData();        // parse CSV, group commits
   initScrollytelling();    // sets up scroll logic
   renderItems(0);          // display first chunk
+
+  // 4) Show summary stats
+  displayStats(commits);
 });
 
 /**
@@ -282,4 +286,51 @@ function updateScatterplot(visibleCommits) {
     `Scatter updated for ${visibleCommits.length} commits, domain=`,
     xScale.domain()
   );
+}
+
+/** 
+ * 5) DISPLAY SUMMARY STATS
+ * 
+ * Example placeholders. Replace logic as needed. 
+ */
+function displayStats(allCommits) {
+  const container = d3.select("#stats");
+  container.html(""); // clear old
+
+  // Example stats
+  const totalLOC = d3.sum(allCommits, c => d3.sum(c.lines, ln => ln.lineCount));
+  const totalCommits = allCommits.length;
+  const averageDepth = 0; // or real calculation
+  const maxDepth = 0;
+  const fileSet = new Set(allCommits.flatMap(c => c.lines.map(ln => ln.file)));
+  const numFiles = fileSet.size;
+  const averageFileLength = (numFiles > 0) ? Math.round(totalLOC / numFiles) : 0;
+  const peakWorkTime = "At Night"; // placeholder
+  const longestLine = 332; // placeholder or real calc
+
+  container.append("dt").text("Total LOC");
+  container.append("dd").text(totalLOC);
+
+  container.append("dt").text("Total Commits");
+  container.append("dd").text(totalCommits);
+
+  container.append("dt").text("Average Depth");
+  container.append("dd").text(averageDepth);
+
+  container.append("dt").text("Maximum Depth");
+  container.append("dd").text(maxDepth);
+
+  container.append("dt").text("Number Of Files");
+  container.append("dd").text(numFiles);
+
+  container.append("dt").text("Average File Length (In Lines)");
+  container.append("dd").text(averageFileLength);
+
+  container.append("dt").text("Peak Work Time");
+  container.append("dd").text(peakWorkTime);
+
+  container.append("dt").text("Longest Line");
+  container.append("dd").text(longestLine);
+
+  console.log("✅ Summary stats displayed");
 }
