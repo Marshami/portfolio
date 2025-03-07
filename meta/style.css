@@ -1,61 +1,58 @@
 body {
     font-family: Arial, sans-serif;
-    max-width: 900px;
+    max-width: 1100px;
     margin: auto;
     padding: 1em;
   }
   
   h1, h2 {
-    text-align: left;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
   }
   
-  /* File-size unit chart layout */
-  .files {
+  dl#stats {
     display: grid;
     grid-template-columns: auto 1fr;
     gap: 0.5rem 1rem;
-    max-width: 100%;
-    margin-top: 1em;
-    background: #f9f9f9;
-    padding: 1em;
-    border: 1px solid #eee;
-    border-radius: 8px;
+    max-width: 300px;
   }
   
-  .files > div {
+  /* The scrollytelling container = 2 columns: left scroller, right chart */
+  #scrollytelling {
     display: grid;
-    grid-template-columns: subgrid;
-    grid-column: 1 / -1;
+    grid-template-columns: 300px 1fr;
+    gap: 1rem;
+    margin-bottom: 3rem;
+    align-items: start;
   }
   
-  .files dt {
-    grid-column: 1;
-    margin-bottom: 0.5em;
-    font-weight: bold;
+  #scroll-container {
+    position: relative;
+    height: 400px; /* or more if you want */
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    background: #fafafa;
   }
   
-  .files dd {
-    grid-column: 2;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25em;
-    margin: 0;
+  #spacer {
+    position: absolute;
+    width: 100%;
+    top: 0;
+    pointer-events: none;
   }
   
-  /* The line dot. Animate new ones from scale(0) */
-  .line {
-    width: 0.5em;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    transition: transform 300ms;
-  }
-  @starting-style {
-    .line {
-      transform: scale(0);
-    }
+  #items-container {
+    position: absolute;
+    width: 100%;
+    top: 0;
   }
   
-  /* Circles in scatterplot */
+  .scrolly-item {
+    border-bottom: 1px solid #eee;
+    font-size: 0.9rem;
+  }
+  
+  /* Optional circle transitions */
   circle {
     transition: r 300ms, fill-opacity 200ms;
   }
@@ -63,10 +60,4 @@ body {
     stroke: #333;
     stroke-width: 2px;
     fill-opacity: 1;
-  }
-  
-  /* Narrative paragraphs */
-  #narrative p {
-    margin: 1em 0;
-    line-height: 1.4;
   }  

@@ -1,37 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Codebase Analysis</title>
-  
-  <!-- Your global stylesheet -->
-  <link rel="stylesheet" href="../style.css" />
+  <meta charset="UTF-8"/>
+  <title>Codebase Evolution</title>
 
-  <!-- D3 and main script -->
+  <!-- Include your global CSS plus the Lab 8 scrollytelling CSS -->
+  <link rel="stylesheet" href="../style.css">
+
+  <!-- D3 and your main script -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="main.js" defer></script>
 
-  <!-- If you have a global nav script -->
+  <!-- (Optional) If you have a global nav script: -->
   <script src="../global.js" type="module"></script>
 </head>
 <body>
-  <h1>Codebase Analysis</h1>
 
-  <!-- Heading for your scatterplot -->
+  <!-- === Lab 8 Format: Summary Stats at the top === -->
+  <h1>Summary</h1>
+  <dl id="stats"></dl>
+
+  <!-- 
+    The “Scrollytelling” container:
+    - A scrollable area on the left for textual commits
+    - The scatterplot on the right
+  -->
   <h2>Commits by Time of Day</h2>
-  <div id="chart"></div>
+  <div id="scrollytelling">
+    <div id="scroll-container">
+      <div id="spacer"></div>
+      <div id="items-container"></div>
+    </div>
+    <div id="chart"></div>
+  </div>
 
-  <hr />
-
-  <!-- File sizes area -->
-  <h2>File Sizes Over Time</h2>
-  <dl class="files"></dl>
-
-  <!-- Evolution Over Time narrative -->
-  <h2>Evolution Over Time</h2>
-  <div id="narrative"></div>
-
-  <!-- Optional summary stats (commits, total lines, etc.) -->
-  <div id="stats" style="margin-top: 2rem;"></div>
 </body>
 </html>
