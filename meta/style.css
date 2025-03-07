@@ -11,32 +11,36 @@ body {
     margin-bottom: 1rem;
   }
   
-  /* TWO-COLUMN SCROLLYTELLING LAYOUT */
+  /* 
+    TWO-COLUMN SCROLLYTELLING LAYOUT
+    Left side (300px) for scroller, 
+    Right side auto for chart 
+  */
   #scrollytelling {
     display: grid;
-    /* left side = 300px, right side = remainder */
     grid-template-columns: 300px 1fr;
     gap: 2rem;
     align-items: start;
     margin-bottom: 3rem;
   }
   
-  /* LEFT SCROLLER */
+  /* Left scroller: 
+     400px tall, can scroll vertically, border for clarity 
+  */
   #scroll-container {
     position: relative;
-    height: 400px;     /* fix some height so we can scroll vertically */
+    height: 400px;
     overflow-y: auto;
     border: 1px solid #ccc;
     background: #fafafa;
     padding: 0.5rem;
   }
   
-  /* #chart is the container on the right */
   #chart {
-    /* e.g. you could do: min-height: 400px; border: 1px dashed #ccc; */
+    /* Right side for the chart, no special rules needed unless you want a min-height or border. */
   }
   
-  /* Optional: Circle transitions for hover in the scatterplot */
+  /* Optional circle transitions for hover */
   circle {
     transition: r 300ms, fill-opacity 200ms;
   }
@@ -44,4 +48,4 @@ body {
     stroke: #333;
     stroke-width: 2px;
     fill-opacity: 1;
-  }  
+  }
