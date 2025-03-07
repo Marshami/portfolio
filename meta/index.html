@@ -3,46 +3,35 @@
 <head>
   <meta charset="UTF-8" />
   <title>Codebase Analysis</title>
-  <!-- Link to your global stylesheet (already in /portfolio/style.css presumably) -->
+  
+  <!-- Your global stylesheet -->
   <link rel="stylesheet" href="../style.css" />
 
-  <!-- D3 + the main script for this page -->
+  <!-- D3 and main script -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="main.js" defer></script>
-  
-  <!-- If you have a global.js for your nav bar, keep it here: -->
+
+  <!-- If you have a global nav script -->
   <script src="../global.js" type="module"></script>
 </head>
 <body>
   <h1>Codebase Analysis</h1>
-  <!-- 
-    Headline area: "Commits by Time of Day" 
-    (We’ll insert an SVG here in main.js)
-  -->
+
+  <!-- Heading for your scatterplot -->
   <h2>Commits by Time of Day</h2>
   <div id="chart"></div>
 
   <hr />
 
-  <!-- File size area for “race” chart (unit chart) -->
+  <!-- File sizes area -->
   <h2>File Sizes Over Time</h2>
   <dl class="files"></dl>
 
-  <!-- 
-    ================ 
-    Lab 8: Evolution Narrative
-    ================
-    We’ll display a list of commits in text form, as an “Evolution Over Time.”
-  -->
+  <!-- Evolution Over Time narrative -->
   <h2>Evolution Over Time</h2>
   <div id="narrative"></div>
 
-  <!-- 
-    OPTIONAL: If you want to show summary stats at the top 
-    (like “Commits: X, Files: Y, Total LOC: Z, …”), 
-    you can add a container for them:
-  -->
+  <!-- Optional summary stats (commits, total lines, etc.) -->
   <div id="stats" style="margin-top: 2rem;"></div>
-
 </body>
 </html>
