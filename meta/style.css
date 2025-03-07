@@ -1,7 +1,7 @@
-/* BASIC PAGE LAYOUT */
+/* Basic page layout */
 body {
     font-family: Arial, sans-serif;
-    max-width: 1200px;  /* overall page width limit */
+    max-width: 1200px; /* overall page width limit */
     margin: auto;
     padding: 1em;
   }
@@ -11,19 +11,11 @@ body {
     margin-bottom: 1rem;
   }
   
-  /* SUMMARY <dl id="stats"> */
-  #stats {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 0.5rem 1rem;
-    max-width: 400px;
-    margin-bottom: 1rem;
-  }
-  
   /* TWO-COLUMN SCROLLYTELLING LAYOUT */
   #scrollytelling {
     display: grid;
-    grid-template-columns: 300px 1fr;  /* left ~300px, right flexible */
+    /* left side = 300px, right side = remainder */
+    grid-template-columns: 300px 1fr;
     gap: 2rem;
     align-items: start;
     margin-bottom: 3rem;
@@ -32,41 +24,19 @@ body {
   /* LEFT SCROLLER */
   #scroll-container {
     position: relative;
-    height: 400px;      /* sets a visible height for scrolling */
-    overflow-y: auto;   /* enable vertical scroll */
+    height: 400px;     /* fix some height so we can scroll vertically */
+    overflow-y: auto;
     border: 1px solid #ccc;
     background: #fafafa;
     padding: 0.5rem;
   }
   
-  /* Invisible block for scrollytelling calculations */
-  #spacer {
-    position: absolute;
-    top: 0;
-    width: 100%;
-    pointer-events: none;
-  }
-  
-  /* The container that holds each commit item in absolute position */
-  #items-container {
-    position: absolute;
-    top: 0;
-    width: 100%;
-  }
-  
-  /* Each commit's text block in the scroller */
-  .scrolly-item {
-    border-bottom: 1px solid #eee;
-    padding: 0.5rem 0;
-    font-size: 0.9rem;
-  }
-  
-  /* RIGHT CHART (#chart) container */
+  /* The chart container on the right has no special styling by default. */
   #chart {
-    /* optionally add: min-height: 400px; or a border if desired */
+    /* e.g. you could do: min-height: 400px; border: 1px dashed #ccc; */
   }
   
-  /* OPTIONAL: Circle transitions & hover effect for the scatterplot */
+  /* Optional: Circle transitions for hover in the scatterplot */
   circle {
     transition: r 300ms, fill-opacity 200ms;
   }
@@ -74,4 +44,5 @@ body {
     stroke: #333;
     stroke-width: 2px;
     fill-opacity: 1;
-  }  
+  }
+  
