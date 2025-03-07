@@ -120,7 +120,6 @@ function renderItems(startIndex) {
       const fileCount = new Set(commit.lines.map(ln => ln.file)).size;
       const desc = (globalIndex === 0) ? "his first commit" : "another commit";
 
-      // Add a data-commit attribute so we can highlight the matching circle
       return `
         <p>
           On ${dtString}, ${commit.author} made 
@@ -145,12 +144,11 @@ function renderItems(startIndex) {
     highlightCircleAndShowTooltip(commitID);
   });
 
-  // Update the chart for this slice
   updateScatterplot(slice);
 }
 
 /**
- * 4) UPDATE SCATTERPLOT => actual min–max date of the chunk, plus ±2 days
+ * 4) UPDATE SCATTERPLOT => actual min–max date
  */
 function updateScatterplot(visibleCommits) {
   const container = d3.select("#chart");
@@ -217,14 +215,12 @@ function updateScatterplot(visibleCommits) {
     .domain([minLines || 0, maxLines || 1])
     .range([3, 25]);
 
-  // Create or select tooltip
   const tooltip = d3.select("body").selectAll(".tooltip")
     .data([null])
     .join("div")
     .attr("class", "tooltip")
     .style("display", "none");
 
-  // Make circles
   svg.selectAll("circle")
     .data(visibleCommits)
     .join("circle")
@@ -234,14 +230,12 @@ function updateScatterplot(visibleCommits) {
     .attr("r", d => rScale(getTotalLines(d)))
     .attr("fill", "steelblue")
     .attr("fill-opacity", 0.7)
-    // HOVER: revert others, highlight this circle, show tooltip
+    // HOVER: revert others, highlight this circle, show tooltip near the mouse
     .on("mouseenter", (event, d) => {
       revertAllCirclesAndHideTooltip();
 
-      // highlight current circle
       d3.select(event.currentTarget).attr("fill", "red").attr("fill-opacity", 1);
 
-      // show tooltip near the mouse
       tooltip.html(`
         <dl>
           <dt>COMMIT</dt><dd>${d.commit}</dd>
@@ -258,7 +252,6 @@ function updateScatterplot(visibleCommits) {
         .style("top",  (event.pageY + 10) + "px");
     })
     .on("mouseleave", () => {
-      // revert everything
       revertAllCirclesAndHideTooltip();
     });
 
@@ -273,7 +266,7 @@ function updateScatterplot(visibleCommits) {
  */
 function displayStats(allCommits) {
   const container = d3.select("#stats");
-  container.html(""); // clear old
+  container.html("");
 
   const totalLOC = d3.sum(allCommits, c => d3.sum(c.lines, ln => ln.lineCount));
   const totalCommits = allCommits.length;
@@ -325,19 +318,32 @@ function revertAllCirclesAndHideTooltip() {
 }
 
 /** 
- * HELPER: highlight the circle by ID, compute bounding rect to place tooltip
- * Not used in this example, but if you want to place the tooltip near the circleEl 
- * instead of near the mouse, you can do boundingRect approach here.
+ * HELPER: highlight the circle + dispatch synthetic mousemove => show tooltip
  */
 function highlightCircleAndShowTooltip(commitID) {
   const circleEl = document.getElementById(`circle-${commitID}`);
   if(!circleEl) return;
 
-  // we basically do what .on("mouseenter") does:
+  // Revert old highlight
   revertAllCirclesAndHideTooltip();
-  d3.select(circleEl).attr("fill","red").attr("fill-opacity",1);
 
-  // you could set tooltip text here as well 
-  // e.g. if you stored data in a dictionary, but typically you have that in .on("mouseenter")
-  // if you want to place the tooltip near circle's bounding rect, you can do so here 
+  // 1) Dispatch "mouseenter" on the circle
+  circleEl.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
+
+  // 2) We also do a "mousemove" with approximate circle position
+  //    We find circleEl's bounding box on the screen
+  const bbox = circleEl.getBoundingClientRect();
+  // let's pick the center of the circle
+  const centerX = bbox.x + bbox.width/2;
+  const centerY = bbox.y + bbox.height/2;
+
+  // dispatch a synthetic "mousemove" event
+  const moveEvt = new MouseEvent("mousemove", {
+    bubbles: true,
+    clientX: centerX,
+    clientY: centerY,
+    pageX: centerX + window.scrollX,
+    pageY: centerY + window.scrollY
+  });
+  circleEl.dispatchEvent(moveEvt);
 }
