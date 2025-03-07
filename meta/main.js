@@ -1,4 +1,4 @@
-console.log("Lab 8 main.js loaded - final scrollytelling version");
+console.log("Lab 8 main.js loaded - scrollytelling with actual min–max date");
 
 /** GLOBAL VARIABLES **/
 // All commits after grouping
@@ -7,16 +7,16 @@ let commits = [];
 // Each chunk of text is 100px high in scroller
 let ITEM_HEIGHT = 100;  
 
-// How many commits per chunk? (1 => user sees each commit individually)
+// How many commits per chunk? (10 => show 10 commits each time)
 let VISIBLE_COUNT = 10;
 
-// We'll define references after the DOM loads
+// We'll define references after DOM load
 let scrollContainer;
 
 /**
  * ON DOM READY:
  *  1) Load loc.csv
- *  2) Initialize scrollytelling
+ *  2) Initialize scroller
  *  3) Render from the top (startIndex=0)
  */
 document.addEventListener("DOMContentLoaded", async () => {
@@ -27,10 +27,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 /**
- * 1) LOAD loc.csv and GROUP by commit
- * 
- * We expect columns:
- *   commit, author, datetime, line, file, type
+ * 1) LOAD DATA FROM loc.csv
+ *
+ * Expects columns: commit, author, datetime, line, file, type
  * Then produce an array of commit objects sorted ascending by date.
  */
 async function loadData() {
@@ -68,18 +67,16 @@ async function loadData() {
 
 /**
  * 2) INIT SCROLLYTELLING
- * 
+ *
  * We'll create a "spacer" div so the scroller is tall enough.
- * Then each chunk is 100px tall (ITEM_HEIGHT).
- * 
  * If we have N commits, totalHeight = N * ITEM_HEIGHT (if VISIBLE_COUNT=1),
- * so user can scroll from top to bottom, each “page” of scroll showing 1 commit.
+ * so user can scroll from top to bottom, each “page” of scroll showing that many commits.
  */
 function initScrollytelling() {
   scrollContainer = d3.select("#scroll-container");
 
-  // total # of commits = commits.length
-  // each commit is 100px => total scrollable height
+  // total # of commits => commits.length
+  // each chunk is ITEM_HEIGHT => total scrollable height
   const totalHeight = commits.length * ITEM_HEIGHT;
 
   // Create the spacer so the scroller has enough vertical space
@@ -105,11 +102,10 @@ function initScrollytelling() {
 
 /**
  * 3) RENDER THE SCROLLY TEXT CHUNKS
- * 
+ *
  * We'll slice the commits from startIndex..(startIndex+VISIBLE_COUNT).
  * Then we absolutely position each chunk at y=(startIndex + i)*ITEM_HEIGHT.
- * After that, we call updateScatterplot for that chunk => 
- * ±5 days around the first commit's date in the chunk.
+ * After that, we call updateScatterplot for that chunk => using the chunk's actual min–max date + 2 days padding.
  */
 function renderItems(startIndex) {
   // Clear old items
@@ -154,13 +150,12 @@ function renderItems(startIndex) {
       `;
     });
 
-  // Now update the chart for just that chunk (±5 day window)
+  // Now update the chart for just that chunk
   updateScatterplot(slice);
 }
 
 /**
- * 4) UPDATE SCATTERPLOT => ±5 DAYS around the FIRST commit's date
- *    so x-axis doesn't get overcluttered, but user can “scroll” day by day.
+ * 4) UPDATE SCATTERPLOT => actual min–max date of the chunk, plus ±2 days padding
  */
 function updateScatterplot(visibleCommits) {
   const container = d3.select("#chart");
@@ -184,21 +179,31 @@ function updateScatterplot(visibleCommits) {
     return;
   }
 
-  // We center on the first commit's date => ±5 days
-  const centerDate = visibleCommits[0].date;
-  const domainStart = d3.timeDay.offset(centerDate, -5);
-  const domainEnd   = d3.timeDay.offset(centerDate, +5);
+  // 1) find min & max date in the slice
+  const sliceMin = d3.min(visibleCommits, d => d.date);
+  const sliceMax = d3.max(visibleCommits, d => d.date);
 
-  // X scale => 11 days total
+  // 2) Expand domain by ±2 days
+  let domainStart = d3.timeDay.offset(sliceMin, -2);
+  let domainEnd   = d3.timeDay.offset(sliceMax, +2);
+
+  // If the entire chunk is the same day => expand ±1 day
+  if (sliceMin.getTime() === sliceMax.getTime()) {
+    domainStart = d3.timeDay.offset(sliceMin, -1);
+    domainEnd   = d3.timeDay.offset(sliceMax, +1);
+  }
+
+  // X scale => from domainStart..domainEnd
   const xScale = d3.scaleTime()
     .domain([domainStart, domainEnd])
     .range([margin.left, width - margin.right]);
 
+  // daily ticks for that range
   const xAxis = d3.axisBottom(xScale)
-    .ticks(d3.timeDay.every(1))  // one tick per day
+    .ticks(d3.timeDay.every(1))
     .tickFormat(d3.timeFormat("%b %d"));
 
-  // Y scale => 0..24 hours
+  // y scale => 0..24 hours
   const yScale = d3.scaleLinear()
     .domain([0, 24])
     .range([height - margin.bottom, margin.top]);
@@ -206,22 +211,21 @@ function updateScatterplot(visibleCommits) {
     .ticks(6)
     .tickFormat(d => `${d}:00`);
 
-  // Draw axes
+  // draw axes
   svg.append("g")
-    .attr("transform", `translate(0, ${height - margin.bottom})`)
+    .attr("transform", `translate(0,${height - margin.bottom})`)
     .call(xAxis);
 
   svg.append("g")
-    .attr("transform", `translate(${margin.left}, 0)`)
+    .attr("transform", `translate(${margin.left},0)`)
     .call(yAxis);
 
-  // radius => sum of lines in the chunk
+  // radius => sum of lines
   const getTotalLines = c => d3.sum(c.lines, ln => ln.lineCount);
   let [minLines, maxLines] = d3.extent(visibleCommits, getTotalLines);
   if (minLines === maxLines) {
-    // if all the same => expand so radius scale won't be zero
     minLines = 0;
-    maxLines = (minLines + 1);
+    maxLines = minLines + 1;
   }
   const rScale = d3.scaleSqrt()
     .domain([minLines || 0, maxLines || 1])
