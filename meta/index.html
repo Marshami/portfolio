@@ -4,38 +4,37 @@
   <meta charset="UTF-8" />
   <title>Meta - Codebase Analysis</title>
 
-  <!-- Your main/global stylesheet -->
-  <link rel="stylesheet" href="../style.css">
+  <!-- Your combined style file -->
+  <link rel="stylesheet" href="../style.css" />
 
-  <!-- D3 + main code -->
+  <!-- D3 & your main script -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="main.js" defer></script>
 
-  <!-- If you have a global.js for navigation, keep it here -->
+  <!-- (Optional) If you have a global navigation script: -->
   <script src="../global.js" type="module"></script>
 </head>
 <body>
 
-  <!-- Optional heading for summary -->
+  <!-- Headings and summary outside the scrolly container -->
   <h2>Summary</h2>
   <dl id="stats"></dl>
 
-  <!-- Next heading, “Commits by Time of Day” -->
   <h2>Commits by Time of Day</h2>
 
   <!-- 
-    SCROLLYTELLING CONTAINER
-    Left column: scrollable text 
-    Right column: chart 
+    SCROLLYTELLING CONTAINER:
+    - Left column: scrollable commit items
+    - Right column: chart 
   -->
   <div id="scrollytelling">
-    <!-- Left side: The scrollable commits -->
+    <!-- left scroller -->
     <div id="scroll-container">
       <div id="spacer"></div>
       <div id="items-container"></div>
     </div>
 
-    <!-- Right side: The chart -->
+    <!-- right chart -->
     <div id="chart"></div>
   </div>
 

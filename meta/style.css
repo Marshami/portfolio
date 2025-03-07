@@ -1,9 +1,7 @@
-/* =========================
-   BASIC PAGE LAYOUT
-========================= */
+/* BASIC PAGE LAYOUT */
 body {
     font-family: Arial, sans-serif;
-    max-width: 1200px;
+    max-width: 1200px;  /* overall page width limit */
     margin: auto;
     padding: 1em;
   }
@@ -13,40 +11,35 @@ body {
     margin-bottom: 1rem;
   }
   
-  /* =========================
-     SUMMARY STATS (OPTIONAL)
-  ========================= */
+  /* SUMMARY <dl id="stats"> */
   #stats {
     display: grid;
     grid-template-columns: auto 1fr;
     gap: 0.5rem 1rem;
     max-width: 400px;
-    margin-bottom: 1rem; /* some spacing below */
+    margin-bottom: 1rem;
   }
   
-  /* =========================
-     SCROLLYTELLING LAYOUT
-     2 columns: left scroller, right chart
-  ========================= */
+  /* TWO-COLUMN SCROLLYTELLING LAYOUT */
   #scrollytelling {
     display: grid;
-    grid-template-columns: 300px 1fr; /* left = 300px, right = remaining space */
-    gap: 2rem;       /* space between columns */
+    grid-template-columns: 300px 1fr;  /* left ~300px, right flexible */
+    gap: 2rem;
     align-items: start;
     margin-bottom: 3rem;
   }
   
-  /* The scrollable container on the LEFT column */
+  /* LEFT SCROLLER */
   #scroll-container {
     position: relative;
-    height: 400px;   /* You can adjust this as desired */
-    overflow-y: auto;
+    height: 400px;      /* sets a visible height for scrolling */
+    overflow-y: auto;   /* enable vertical scroll */
     border: 1px solid #ccc;
     background: #fafafa;
-    padding: 0.5rem; /* optional padding inside the scroller */
+    padding: 0.5rem;
   }
   
-  /* spacer = invisible element used for scrollytelling calculations */
+  /* Invisible block for scrollytelling calculations */
   #spacer {
     position: absolute;
     top: 0;
@@ -54,30 +47,26 @@ body {
     pointer-events: none;
   }
   
-  /* items-container = absolutely positioned, holds each commit item */
+  /* The container that holds each commit item in absolute position */
   #items-container {
     position: absolute;
     top: 0;
     width: 100%;
   }
   
-  /* each scrolly “paragraph block” if you use absolute positioning from JS */
+  /* Each commit's text block in the scroller */
   .scrolly-item {
     border-bottom: 1px solid #eee;
     padding: 0.5rem 0;
     font-size: 0.9rem;
   }
   
-  /* The chart area on the RIGHT column 
-     (no special rules needed unless you want a min-height or border)
-  */
+  /* RIGHT CHART (#chart) container */
   #chart {
-    /* e.g. min-height: 400px; */
+    /* optionally add: min-height: 400px; or a border if desired */
   }
   
-  /* =========================
-     CIRCLES (SCATTERPLOT)
-  ========================= */
+  /* OPTIONAL: Circle transitions & hover effect for the scatterplot */
   circle {
     transition: r 300ms, fill-opacity 200ms;
   }
@@ -85,4 +74,4 @@ body {
     stroke: #333;
     stroke-width: 2px;
     fill-opacity: 1;
-  }
+  }  
