@@ -3,16 +3,17 @@ body {
     max-width: 900px;
     margin: auto;
     padding: 1em;
-}
-
-h1, h2 {
+  }
+  
+  h1, h2 {
     text-align: center;
-}
-
-/* ========================= */
-/* SUMMARY STATS (original) */
-/* ========================= */
-.stats {
+  }
+  
+  /* ============ */
+  /* Original Stats .stats, etc. from your code... */
+  /* ============ */
+  
+  .stats {
     display: grid;
     grid-template-columns: auto 1fr;
     gap: 10px;
@@ -21,78 +22,109 @@ h1, h2 {
     padding: 1em;
     background: #f9f9f9;
     border-radius: 8px;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-/* ========================= */
-/* TOOLTIP (original) */
-/* ========================= */
-.tooltip {
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+  }
+  
+  .tooltip {
     position: fixed;
     top: 1em;
     left: 1em;
     padding: 10px;
-    background: white;
+    background: #fff;
     border: 1px solid #ddd;
     border-radius: 5px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-/* ========================= */
-/* Circle Hover Animation */
-/* ========================= */
-circle {
-    /* LAB 8 ADDITION: Animate radius changes or scale */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  }
+  
+  /* Circle transitions in scatterplot */
+  circle {
     transition: 200ms;
     transform-origin: center;
     transform-box: fill-box;
-}
-
-circle:hover {
+  }
+  circle:hover {
     transform: scale(1.5);
-}
-
-/* ========================= */
-/* LAB 8 ADDITION: 
-   Scrollytelling Layout 
-========================= */
-#scrollytelling {
-    /* This container can be arranged however you like. 
-       We'll keep it simple: full width, margin-bottom, etc. */
-    margin-bottom: 2rem;
-}
-
-#scroll-container {
+  }
+  
+  /* ======================================== */
+  /* LAB 8: PINNED SCROLLYTELLING LAYOUT */
+  /* ======================================== */
+  #scrolly-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr; /* left narrower pinned, right wider text */
+    gap: 2rem;
+    margin-top: 2rem;
+    margin-bottom: 3rem;
     position: relative;
-    height: 400px;      /* scroll area height */
-    overflow-y: auto;
+  }
+  
+  /* The pinned chart container: 
+     We'll fix its position while the user scrolls */
+  #pinned-chart-container {
+    position: sticky;   /* make it stick while scrolling */
+    top: 2rem;          /* so it doesn't hide under top of page */
+    height: 80vh;       /* keep a decent height */
     border: 1px solid #ccc;
-    margin: 1em 0;
-}
-
-#spacer {
+    background: #fafafa;
+  }
+  
+  /* The pinned chart inside that container */
+  #pinned-chart {
+    width: 100%;
+    height: 100%;
+    /* We'll do the actual D3 <svg> inside JS */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* The right side with scrollable text. */
+  #text-scroller {
+    position: relative;
+    height: 80vh;  /* same as pinned chart's height, so you see a direct side-by-side effect */
+    overflow: hidden; /* hide overflow, we'll manage scroll inside a child. */
+    border: 1px solid #ddd;
+    background: #fff;
+  }
+  
+  /* #scroll-narrative is the real scroll container */
+  #scroll-narrative {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll; /* user scroll here */
+  }
+  
+  #scroll-spacer {
     position: absolute;
     top: 0;
     width: 100%;
     pointer-events: none;
-}
-
-#items-container {
+    /* We’ll set its height dynamically from JS if we want. */
+  }
+  
+  #scroll-steps {
     position: absolute;
     top: 0;
     width: 100%;
-}
-
-/* If you want each item to have some default styling,
-   you can put it here or do inline styles in main.js. */
-
-/* ========================= */
-/* LAB 8 ADDITION:
-   File Size “Race” (Unit Chart)
-========================= */
-.files {
+  }
+  
+  /* Each “step” of text scrollytelling */
+  .step {
+    position: absolute;
+    width: 100%;
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+  }
+  
+  /* ============= */
+  /* FILE SIZE RACE 
+     using <dl class="files"> 
+     from your earlier code 
+  ============== */
+  .files {
     display: grid;
-    grid-template-columns: auto 1fr;  /* dt in col1, dd in col2 */
+    grid-template-columns: auto 1fr;
     gap: 0.5rem 1rem;
     max-width: 100%;
     margin-top: 1em;
@@ -100,43 +132,37 @@ circle:hover {
     padding: 1em;
     border: 1px solid #eee;
     border-radius: 8px;
-}
-
-/* 
-  Each file is wrapped in a <div>, with dt + dd inside.
-  We'll rely on subgrid to keep them lined up. 
-*/
-.files > div {
+  }
+  
+  .files > div {
     display: grid;
     grid-template-columns: subgrid;
     grid-column: 1 / -1;
-}
-
-.files dt {
+  }
+  
+  .files dt {
     grid-column: 1;
     margin-bottom: 0.5em;
     font-weight: bold;
-}
-
-.files dd {
+  }
+  
+  .files dd {
     grid-column: 2;
     display: flex;
     flex-wrap: wrap;
     gap: 0.25em;
     margin: 0;
-}
-
-/* Each “line” dot in the unit chart */
-.line {
+  }
+  
+  /* Each “line” dot for the unit chart */
+  .line {
     width: 0.5em;
     aspect-ratio: 1;
     border-radius: 50%;
     transition: transform 300ms;
-}
-
-/* Animate lines from scale(0) so they “pop in” */
-@starting-style {
+  }
+  @starting-style {
     .line {
-        transform: scale(0);
+      transform: scale(0);
     }
-}
+  }  

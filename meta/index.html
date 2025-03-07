@@ -1,54 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Codebase Analysis</title>
+  <meta charset="UTF-8" />
+  <title>Codebase Analysis</title>
 
-    <!-- Keep your original style link: -->
-    <link rel="stylesheet" href="../style.css">
+  <!-- Original CSS -->
+  <link rel="stylesheet" href="../style.css" />
 
-    <!-- D3 and scripts: -->
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="main.js" defer></script>
-    <script src="../global.js" type="module"></script> <!-- ✅ Add Global Navigation -->
+  <!-- D3 & JS -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="main.js" defer></script>
+  <script src="../global.js" type="module"></script> <!-- your global nav, if needed -->
 </head>
 <body>
-    <h1>Codebase Analysis</h1>
-    
-    <!-- Summary Stats -->
-    <div id="stats"></div>
+  <h1>Codebase Analysis</h1>
 
-    <!-- Scatter Plot -->
-    <h2>Commits by Time of Day</h2>
-    <div id="chart"></div>
+  <!-- Existing Stats Section -->
+  <div id="stats"></div>
 
-    <!-- Tooltip for commit details -->
-    <dl id="commit-tooltip" class="info tooltip" hidden>
-        <dt>Commit:</dt> <dd><a href="" id="commit-link" target="_blank"></a></dd>
-        <dt>Date:</dt> <dd id="commit-date"></dd>
-        <dt>Time:</dt> <dd id="commit-time"></dd>
-        <dt>Author:</dt> <dd id="commit-author"></dd>
-        <dt>Lines Edited:</dt> <dd id="commit-lines"></dd>
-    </dl>
+  <!-- Existing Scatter Plot Section -->
+  <h2>Commits by Time of Day</h2>
+  <div id="chart"></div>
 
-    <!-- =========================================== -->
-    <!-- LAB 8 ADDITION #1: Scrollytelling for COMMITS -->
-    <!-- =========================================== -->
-    <h2>Scrollytelling: Commits Over Time</h2>
-    <div id="scrollytelling">
-      <div id="scroll-container">
-        <div id="spacer"></div>
-        <div id="items-container"></div>
-      </div>
+  <!-- Tooltip from your older code (unchanged) -->
+  <dl id="commit-tooltip" class="info tooltip" hidden>
+    <dt>Commit:</dt> <dd><a href="" id="commit-link" target="_blank"></a></dd>
+    <dt>Date:</dt> <dd id="commit-date"></dd>
+    <dt>Time:</dt> <dd id="commit-time"></dd>
+    <dt>Author:</dt> <dd id="commit-author"></dd>
+    <dt>Lines Edited:</dt> <dd id="commit-lines"></dd>
+  </dl>
+
+  <!-- 
+    ================================================
+    LAB 8: SCROLLYTELLING BLOCK (PINNED CHART STYLE)
+    ================================================
+  -->
+  <div id="scrolly-layout">
+    <!-- The pinned chart area (optional: you can reuse #chart if you want to swap the above one out) -->
+    <div id="pinned-chart-container">
+      <div id="pinned-chart"></div>
     </div>
 
-    <!-- =========================================== -->
-    <!-- LAB 8 ADDITION #2: File Size “Race” (Unit Chart) -->
-    <!-- =========================================== -->
-    <h2>File Size Visualization</h2>
-    <!-- We’ll append file info here -->
-    <dl class="files"></dl>
+    <!-- The scrolling text area -->
+    <div id="text-scroller">
+      <div id="scroll-narrative">
+        <div id="scroll-spacer"></div>
+        <div id="scroll-steps"></div>
+      </div>
+    </div>
+  </div>
 
+  <hr />
+
+  <!-- 
+    LAB 8: FILE-SIZE VISUALIZATION 
+    (The “race” or unit chart portion)
+  -->
+  <h2>File Sizes Over Time</h2>
+  <dl class="files"></dl>
 </body>
 </html>
