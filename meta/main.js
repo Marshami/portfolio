@@ -145,11 +145,11 @@ function renderItems(startIndex) {
       // earliest commit => "his first commit"
       const desc = (globalIndex === 0) ? "his first commit" : "another commit";
 
-      // ADD data-commit attribute; remove target="_blank"
+      // Add a data-commit attribute so we can highlight the matching circle
       return `
         <p>
           On ${dtString}, ${commit.author} made 
-          <a href="#"
+          <a href="#" 
              class="commit-link"
              data-commit="${commit.commit}"
           >${desc}</a>.<br/>
@@ -158,17 +158,19 @@ function renderItems(startIndex) {
       `;
     });
 
-  // Attach click listener to highlight the circle + show tooltip
+  // When user clicks a link => revert all circles, highlight & show info for that commit
   d3.selectAll(".commit-link").on("click", (evt) => {
-    evt.preventDefault(); // don't open a page
+    evt.preventDefault(); // no navigation
     const commitID = evt.currentTarget.dataset.commit;
 
-    // find that circle & dispatch "mouseenter" so it acts like a hover
-    const circleEl = document.getElementById("circle-" + commitID);
+    // revert all circles
+    d3.selectAll("circle").attr("fill", "steelblue").attr("fill-opacity", 0.7);
+    d3.select("body").selectAll(".tooltip").style("display", "none");
+
+    // find the circle & dispatch "mouseenter" => highlight it & show tooltip
+    const circleEl = document.getElementById(`circle-${commitID}`);
     if (circleEl) {
-      // Force the circle to do a "mouseenter" so it turns red & shows tooltip
-      const e = new MouseEvent("mouseenter", { bubbles: true });
-      circleEl.dispatchEvent(e);
+      circleEl.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
     }
   });
 
@@ -201,11 +203,11 @@ function updateScatterplot(visibleCommits) {
     return;
   }
 
-  // 1) find min & max date in the slice
+  // find min & max date in the slice
   const sliceMin = d3.min(visibleCommits, d => d.date);
   const sliceMax = d3.max(visibleCommits, d => d.date);
 
-  // 2) Expand domain by ±2 days
+  // Expand domain by ±2 days
   let domainStart = d3.timeDay.offset(sliceMin, -2);
   let domainEnd   = d3.timeDay.offset(sliceMax, +2);
 
@@ -215,12 +217,12 @@ function updateScatterplot(visibleCommits) {
     domainEnd   = d3.timeDay.offset(sliceMax, +1);
   }
 
-  // X scale => from domainStart..domainEnd
+  // X scale
   const xScale = d3.scaleTime()
     .domain([domainStart, domainEnd])
     .range([margin.left, width - margin.right]);
 
-  // daily ticks for that range
+  // daily ticks
   const xAxis = d3.axisBottom(xScale)
     .ticks(d3.timeDay.every(1))
     .tickFormat(d3.timeFormat("%b %d"));
@@ -254,18 +256,17 @@ function updateScatterplot(visibleCommits) {
     .range([3, 25]);
 
   // ================ TOOLTIP SETUP ================
-  // We'll create a tooltip div (if it doesn't exist yet)
   const tooltip = d3.select("body").selectAll(".tooltip")
-    .data([null])  // a trick to create if not exist
+    .data([null])
     .join("div")
     .attr("class", "tooltip")
-    .style("display", "none"); // hidden by default
+    .style("display", "none");
 
   // Circles => each commit in slice
   svg.selectAll("circle")
     .data(visibleCommits)
     .join("circle")
-    // give each circle an id => "circle-<commitID>"
+    // give each circle an id => circle-<commitID>
     .attr("id", d => `circle-${d.commit}`)
     .attr("cx", d => xScale(d.date))
     .attr("cy", d => yScale(d.date.getHours()))
@@ -273,10 +274,14 @@ function updateScatterplot(visibleCommits) {
     .attr("fill", "steelblue")
     .attr("fill-opacity", 0.7)
     .on("mouseenter", (event, d) => {
-      // Turn hovered circle red
-      d3.select(event.currentTarget).attr("fill", "red");
+      // revert all circles first
+      d3.selectAll("circle").attr("fill", "steelblue").attr("fill-opacity", 0.7);
+      tooltip.style("display", "none");
 
-      // Fill the tooltip with commit details
+      // highlight this circle
+      d3.select(event.currentTarget).attr("fill", "red").attr("fill-opacity", 1);
+
+      // show tooltip
       tooltip.html(`
         <dl>
           <dt>COMMIT</dt><dd>${d.commit}</dd>
@@ -285,19 +290,16 @@ function updateScatterplot(visibleCommits) {
           <dt>AUTHOR</dt><dd>${d.author}</dd>
           <dt>LINES EDITED</dt><dd>${getTotalLines(d)}</dd>
         </dl>
-      `);
-      tooltip.style("display", "block");
+      `).style("display", "block");
     })
     .on("mousemove", (event) => {
-      // position the tooltip near the cursor
       tooltip
         .style("left", (event.pageX + 10) + "px")
         .style("top",  (event.pageY + 10) + "px");
     })
-    .on("mouseleave", (event) => {
-      // revert color
-      d3.select(event.currentTarget).attr("fill", "steelblue");
-      // hide tooltip
+    .on("mouseleave", () => {
+      // revert all circles => none remains highlighted
+      d3.selectAll("circle").attr("fill", "steelblue").attr("fill-opacity", 0.7);
       tooltip.style("display", "none");
     });
 
@@ -309,8 +311,6 @@ function updateScatterplot(visibleCommits) {
 
 /** 
  * 5) DISPLAY SUMMARY STATS
- * 
- * Example placeholders. Replace logic as needed. 
  */
 function displayStats(allCommits) {
   const container = d3.select("#stats");
@@ -319,13 +319,13 @@ function displayStats(allCommits) {
   // Example stats
   const totalLOC = d3.sum(allCommits, c => d3.sum(c.lines, ln => ln.lineCount));
   const totalCommits = allCommits.length;
-  const averageDepth = 0; // or real calculation
+  const averageDepth = 0;
   const maxDepth = 0;
   const fileSet = new Set(allCommits.flatMap(c => c.lines.map(ln => ln.file)));
   const numFiles = fileSet.size;
   const averageFileLength = (numFiles > 0) ? Math.round(totalLOC / numFiles) : 0;
-  const peakWorkTime = "At Night"; // placeholder
-  const longestLine = 332; // placeholder or real calc
+  const peakWorkTime = "At Night";
+  const longestLine = 332;
 
   container.append("dt").text("Total LOC");
   container.append("dd").text(totalLOC);
