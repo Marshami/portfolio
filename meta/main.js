@@ -3,8 +3,7 @@ console.log("Main.js loaded - scrollytelling with a ±5-day sliding window");
 /** GLOBAL VARIABLES **/
 let commits = [];
 let ITEM_HEIGHT = 100;   // Each commit text block is 100px tall
-let VISIBLE_COUNT = 1;   // We'll show 1 commit per chunk for easy date-chunking
-                         // (or use 5 if you want 5 commits per chunk)
+let VISIBLE_COUNT = 1;   // We'll show 1 commit per chunk by default (easy to see date sliding)
 let scrollContainer;
 
 /**
@@ -36,7 +35,7 @@ async function loadData() {
     type: row.type
   }));
 
-  // Group by commit
+  // Group rows by commit
   const grouped = d3.groups(raw, d => d.commit).map(([commitId, rows]) => {
     const first = rows[0];
     return {
