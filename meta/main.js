@@ -249,6 +249,9 @@ function updateScatterplot(visibleCommits) {
     .attr("fill", "steelblue")
     .attr("fill-opacity", 0.7)
     .on("mouseenter", (event, d) => {
+      // Turn hovered circle red
+      d3.select(event.currentTarget).attr("fill", "red");
+
       // Fill the tooltip with commit details
       tooltip.html(`
         <dl>
@@ -267,7 +270,10 @@ function updateScatterplot(visibleCommits) {
         .style("left", (event.pageX + 10) + "px")
         .style("top",  (event.pageY + 10) + "px");
     })
-    .on("mouseleave", () => {
+    .on("mouseleave", (event) => {
+      // revert color
+      d3.select(event.currentTarget).attr("fill", "steelblue");
+
       // hide tooltip
       tooltip.style("display", "none");
     });
