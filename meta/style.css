@@ -1,6 +1,9 @@
+/* =========================
+   BASIC PAGE LAYOUT
+========================= */
 body {
     font-family: Arial, sans-serif;
-    max-width: 1100px;
+    max-width: 1200px;
     margin: auto;
     padding: 1em;
   }
@@ -10,49 +13,71 @@ body {
     margin-bottom: 1rem;
   }
   
-  dl#stats {
+  /* =========================
+     SUMMARY STATS (OPTIONAL)
+  ========================= */
+  #stats {
     display: grid;
     grid-template-columns: auto 1fr;
     gap: 0.5rem 1rem;
-    max-width: 300px;
+    max-width: 400px;
+    margin-bottom: 1rem; /* some spacing below */
   }
   
-  /* The scrollytelling container = 2 columns: left scroller, right chart */
+  /* =========================
+     SCROLLYTELLING LAYOUT
+     2 columns: left scroller, right chart
+  ========================= */
   #scrollytelling {
     display: grid;
-    grid-template-columns: 300px 1fr;
-    gap: 1rem;
-    margin-bottom: 3rem;
+    grid-template-columns: 300px 1fr; /* left = 300px, right = remaining space */
+    gap: 2rem;       /* space between columns */
     align-items: start;
+    margin-bottom: 3rem;
   }
   
+  /* The scrollable container on the LEFT column */
   #scroll-container {
     position: relative;
-    height: 400px; /* or more if you want */
+    height: 400px;   /* You can adjust this as desired */
     overflow-y: auto;
     border: 1px solid #ccc;
     background: #fafafa;
+    padding: 0.5rem; /* optional padding inside the scroller */
   }
   
+  /* spacer = invisible element used for scrollytelling calculations */
   #spacer {
     position: absolute;
-    width: 100%;
     top: 0;
+    width: 100%;
     pointer-events: none;
   }
   
+  /* items-container = absolutely positioned, holds each commit item */
   #items-container {
     position: absolute;
-    width: 100%;
     top: 0;
+    width: 100%;
   }
   
+  /* each scrolly “paragraph block” if you use absolute positioning from JS */
   .scrolly-item {
     border-bottom: 1px solid #eee;
+    padding: 0.5rem 0;
     font-size: 0.9rem;
   }
   
-  /* Optional circle transitions */
+  /* The chart area on the RIGHT column 
+     (no special rules needed unless you want a min-height or border)
+  */
+  #chart {
+    /* e.g. min-height: 400px; */
+  }
+  
+  /* =========================
+     CIRCLES (SCATTERPLOT)
+  ========================= */
   circle {
     transition: r 300ms, fill-opacity 200ms;
   }
@@ -60,4 +85,4 @@ body {
     stroke: #333;
     stroke-width: 2px;
     fill-opacity: 1;
-  }  
+  }

@@ -1,36 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <title>Codebase Evolution</title>
+  <meta charset="UTF-8" />
+  <title>Meta - Codebase Analysis</title>
 
-  <!-- Include your global CSS plus the Lab 8 scrollytelling CSS -->
+  <!-- Your main/global stylesheet -->
   <link rel="stylesheet" href="../style.css">
 
-  <!-- D3 and your main script -->
+  <!-- D3 + main code -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="main.js" defer></script>
 
-  <!-- (Optional) If you have a global nav script: -->
+  <!-- If you have a global.js for navigation, keep it here -->
   <script src="../global.js" type="module"></script>
 </head>
 <body>
 
-  <!-- === Lab 8 Format: Summary Stats at the top === -->
-  <h1>Summary</h1>
+  <!-- Optional heading for summary -->
+  <h2>Summary</h2>
   <dl id="stats"></dl>
 
-  <!-- 
-    The “Scrollytelling” container:
-    - A scrollable area on the left for textual commits
-    - The scatterplot on the right
-  -->
+  <!-- Next heading, “Commits by Time of Day” -->
   <h2>Commits by Time of Day</h2>
+
+  <!-- 
+    SCROLLYTELLING CONTAINER
+    Left column: scrollable text 
+    Right column: chart 
+  -->
   <div id="scrollytelling">
+    <!-- Left side: The scrollable commits -->
     <div id="scroll-container">
       <div id="spacer"></div>
       <div id="items-container"></div>
     </div>
+
+    <!-- Right side: The chart -->
     <div id="chart"></div>
   </div>
 
