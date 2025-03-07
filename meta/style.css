@@ -1,142 +1,142 @@
-/* Basic page styling */
 body {
     font-family: Arial, sans-serif;
-    margin: 2rem auto;
-    max-width: min(120ch, 80vw);
-    line-height: 1.5;
-  }
-  
-  /* 
-    We rely on subgrid or some other layout approach 
-    for the scrollytelling containers 
-  */
-  #scrollytelling-commits {
+    max-width: 900px;
+    margin: auto;
+    padding: 1em;
+}
+
+h1, h2 {
+    text-align: center;
+}
+
+/* ========================= */
+/* SUMMARY STATS (original) */
+/* ========================= */
+.stats {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* left text, right chart */
-    gap: 1rem;
+    grid-template-columns: auto 1fr;
+    gap: 10px;
+    max-width: 400px;
+    margin: auto;
+    padding: 1em;
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* ========================= */
+/* TOOLTIP (original) */
+/* ========================= */
+.tooltip {
+    position: fixed;
+    top: 1em;
+    left: 1em;
+    padding: 10px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* ========================= */
+/* Circle Hover Animation */
+/* ========================= */
+circle {
+    /* LAB 8 ADDITION: Animate radius changes or scale */
+    transition: 200ms;
+    transform-origin: center;
+    transform-box: fill-box;
+}
+
+circle:hover {
+    transform: scale(1.5);
+}
+
+/* ========================= */
+/* LAB 8 ADDITION: 
+   Scrollytelling Layout 
+========================= */
+#scrollytelling {
+    /* This container can be arranged however you like. 
+       We'll keep it simple: full width, margin-bottom, etc. */
     margin-bottom: 2rem;
-  }
-  
-  /* The scrollable container for commits */
-  #scroll-container-commits {
+}
+
+#scroll-container {
     position: relative;
-    height: 400px;   /* pick any height you like */
+    height: 400px;      /* scroll area height */
     overflow-y: auto;
     border: 1px solid #ccc;
-  }
-  
-  #spacer-commits {
+    margin: 1em 0;
+}
+
+#spacer {
     position: absolute;
     top: 0;
     width: 100%;
     pointer-events: none;
-  }
-  
-  #items-container-commits {
+}
+
+#items-container {
     position: absolute;
     top: 0;
     width: 100%;
-  }
-  
-  /* Each scrollytelling item (like a single commit’s story block) */
-  .item-commit {
-    position: absolute;
-    height: 100px; /* or bigger if you have more text */
-    border-bottom: 1px solid #eee;
-    padding: 0.5rem;
-  }
-  
-  /* The chart for commits (scatterplot) */
-  #chart-commits svg {
-    width: 100%;
-    height: 450px;
-  }
-  
-  /* Race for biggest file. We'll just show a .files <dl> below: */
-  .files {
+}
+
+/* If you want each item to have some default styling,
+   you can put it here or do inline styles in main.js. */
+
+/* ========================= */
+/* LAB 8 ADDITION:
+   File Size “Race” (Unit Chart)
+========================= */
+.files {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* dt & dd side by side, if you prefer */
-    gap: 1rem 2rem;
-    margin-bottom: 2rem;
-    align-items: start;
-  }
-  
-  /* Each file’s <div> has dt and dd sub-elements. Let’s do subgrid for neat alignment */
-  .files > div {
+    grid-template-columns: auto 1fr;  /* dt in col1, dd in col2 */
+    gap: 0.5rem 1rem;
+    max-width: 100%;
+    margin-top: 1em;
+    background: #fdfdfd;
+    padding: 1em;
+    border: 1px solid #eee;
+    border-radius: 8px;
+}
+
+/* 
+  Each file is wrapped in a <div>, with dt + dd inside.
+  We'll rely on subgrid to keep them lined up. 
+*/
+.files > div {
     display: grid;
     grid-template-columns: subgrid;
     grid-column: 1 / -1;
-  }
-  
-  /* dt (filename) in col 1, dd (unit dots) in col 2 */
-  .files dt {
+}
+
+.files dt {
     grid-column: 1;
+    margin-bottom: 0.5em;
     font-weight: bold;
-  }
-  .files dd {
+}
+
+.files dd {
     grid-column: 2;
     display: flex;
     flex-wrap: wrap;
-    gap: 0.2rem;
+    gap: 0.25em;
     margin: 0;
-  }
-  
-  .line {
+}
+
+/* Each “line” dot in the unit chart */
+.line {
     width: 0.5em;
     aspect-ratio: 1;
     border-radius: 50%;
-    /* entry transitions */
-    transition: all 300ms;
-  }
-  @starting-style {
+    transition: transform 300ms;
+}
+
+/* Animate lines from scale(0) so they “pop in” */
+@starting-style {
     .line {
-      transform: scale(0);
+        transform: scale(0);
     }
-  }
-  
-  /* Second scrollytelling container (for files) */
-  #scrollytelling-files {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-bottom: 4rem;
-  }
-  
-  #scroll-container-files {
-    position: relative;
-    height: 300px;
-    overflow-y: auto;
-    border: 1px solid #ccc;
-    margin-bottom: 2rem;
-  }
-  #spacer-files {
-    position: absolute;
-    top: 0;
-    width: 100%;
-    pointer-events: none;
-  }
-  #items-container-files {
-    position: absolute;
-    top: 0;
-    width: 100%;
-  }
-  .item-file {
-    position: absolute;
-    height: 80px;
-    border-bottom: 1px solid #eee;
-    padding: 0.5rem;
-  }
-  
-  /* Circles for scatterplot */
-  circle {
-    transition: r 300ms, fill-opacity 200ms;
-  }
-  @starting-style {
-    circle {
-      r: 0; /* new circles animate in from r=0 to final radius */
-    }
-  }
-  circle:hover {
-    stroke: #333;
-    stroke-width: 2px;
-  }  
+}

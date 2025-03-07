@@ -1,251 +1,389 @@
-console.log("✅ Lab 8 main.js loaded");
+console.log("✅ D3 script is running...");
 
-// ===============================
-// 1. Global Data + Setup
-// ===============================
+// ====================
+// 🚀 GLOBAL ARRAYS & SETTINGS
+// ====================
+let data = [];               // All rows from loc.csv
+let commits = [];            // Distilled commits for scrollytelling
+let VISIBLE_COUNT = 6;       // How many scrollytelling items to show at once
+let ITEM_HEIGHT = 120;       // Pixel height per scrollytelling item
 
-let commits = [];
-let NUM_ITEMS_COMMITS = 50;       // how many commits we want to simulate
-let ITEM_HEIGHT_COMMITS = 100;    // how tall each item in scroller #1
-let VISIBLE_COUNT_COMMITS = 5;    // how many items to show at once
+// For scrollytelling elements:
+let scrollContainer, spacer, itemsContainer;
 
-let scrollContainerCommits, spacerCommits, itemsContainerCommits;
-
-let fileTypeColor = d3.scaleOrdinal(d3.schemeTableau10);
-
-// For a second scrolly (files):
-let scrollContainerFiles, spacerFiles, itemsContainerFiles;
-let NUM_ITEMS_FILES = 10;
-let ITEM_HEIGHT_FILES = 80;
-let VISIBLE_COUNT_FILES = 5;
-
-// ===============================
-// 2. Load or Mock Data
-// ===============================
+// ====================
+// 🚀 Load Data (loc.csv)
+// ====================
 async function loadData() {
-  // If you have a real CSV:
-  // commits = await d3.csv("loc.csv", d => ({
-  //   commit: d.commit,
-  //   datetime: new Date(d.datetime),
-  //   author: d.author,
-  //   linesEdited: +d.line,
-  //   type: d.type,
-  //   ...
-  // }));
+    data = await d3.csv('loc.csv', (row) => ({
+        commit: row.commit,
+        author: row.author,
+        date: new Date(row.date + 'T00:00' + row.timezone),
+        datetime: new Date(row.datetime),
+        line: +row.line,
+        type: row.type, // e.g. "css", "js", "html"
+        hour: new Date(row.datetime).getHours(), // for time-of-day analysis
+    }));
 
-  // For demonstration, let’s generate mock commits
-  commits = d3.range(50).map(i => {
-    const date = new Date(2025, 2, i % 30, i % 24); // just a random date
-    return {
-      commit: "abc" + i,
-      datetime: date,
-      hour: date.getHours(),
-      totalLines: Math.floor(Math.random() * 500) + 20,
-      lines: d3.range(Math.floor(Math.random() * 50) + 10).map(() => ({
-        file: i % 2 === 0 ? "main.js" : "style.css",
-        type: i % 3 === 0 ? "js" : (i % 3 === 1 ? "css" : "html")
-      }))
+    console.log("✅ Loaded Data:", data);
+
+    // We can group by commit to produce a simpler “commits” array
+    // Each commit entry can hold:
+    //   commit ID, author, datetime, totalLines, plus an array of lines
+    //   to facilitate the file-size “race.”
+    const grouped = d3.groups(data, d => d.commit)
+      .map(([commitId, rows]) => {
+         const firstRow = rows[0];
+         return {
+           commit: commitId,
+           author: firstRow.author,
+           datetime: firstRow.datetime,
+           hour: firstRow.hour,
+           lines: rows.map(r => ({
+             file: r.file,
+             type: r.type,
+             lineCount: r.line
+           })),
+           totalLines: d3.sum(rows, r => r.line)
+         };
+      });
+
+    // Sort commits by date ascending:
+    grouped.sort((a, b) => a.datetime - b.datetime);
+
+    commits = grouped;
+    console.log("✅ Aggregated commits for scrollytelling:", commits);
+
+    // Initialize everything
+    displayStats();     // summary stats
+    createScatterplot(); // initial scatterplot
+    initScrollytelling(); // set up scrollytelling
+    renderItems(0);      // draw the first scrollytelling “page”
+
+    // Initialize the file size “race”
+    displayCommitFiles(commits);  // show all commits by default
+}
+
+// ====================
+// 🚀 Display Summary Stats (Including Most Active Time of Day)
+// ====================
+function displayStats() {
+    const totalCommits = new Set(data.map(d => d.commit)).size;
+    const totalLines = d3.sum(data, d => d.line);
+
+    // ✅ Group commits by time of day
+    const timeCategories = {
+        "Morning": data.filter(d => d.hour >= 6 && d.hour < 12).length,
+        "Afternoon": data.filter(d => d.hour >= 12 && d.hour < 18).length,
+        "Evening": data.filter(d => d.hour >= 18 && d.hour < 24).length,
+        "Night": data.filter(d => d.hour >= 0 && d.hour < 6).length
     };
-  });
 
-  // In real usage, you might unify lines differently. This is just a placeholder.
-  // Each commit has 'lines' array with objects {file, type}.
+    // ✅ Find the time of day with the most commits
+    const mostActiveTime = Object.entries(timeCategories)
+        .reduce((max, entry) => (entry[1] > max[1] ? entry : max), ["None", 0])[0];
 
-  console.log("Loaded mock commits:", commits);
-  setupScrollytellingCommits();
-  createScatterplot();
-  renderItemsCommits(0);
+    console.log("Debug Stats:");
+    console.log("Total Commits:", totalCommits);
+    console.log("Total LOC:", totalLines);
+    console.log("Most Active Time of Day:", mostActiveTime);
 
-  // Similarly, set up second scrolly if needed
-  setupScrollytellingFiles();
-  renderItemsFiles(0);
+    // Clear previous stats
+    d3.select("#stats").html("");
 
-  // Also display the unit chart for all commits (or you might do it scrollytelling-based).
-  displayCommitFiles(commits);
+    const stats = d3.select("#stats")
+        .append("dl")
+        .attr("class", "stats");
+
+    stats.append("dt").text("Total Commits");
+    stats.append("dd").text(totalCommits);
+
+    stats.append("dt").text("Total Lines of Code (LOC)");
+    stats.append("dd").text(totalLines);
+
+    stats.append("dt").text("Most Active Time of Day");
+    stats.append("dd").text(mostActiveTime);
+
+    console.log("✅ Stats Computed & Displayed");
 }
 
-// ===============================
-// 3. Scatterplot for Commits
-// ===============================
+// ====================
+// 🚀 Create Scatterplot with Grid Lines
+// ====================
 function createScatterplot() {
-  const width = 600, height = 400, margin = 40;
+    console.log("🔄 Creating Scatterplot...");
 
-  d3.select("#chart-commits").selectAll("svg").remove();
+    if (data.length === 0) {
+        console.error("❌ No data available for scatterplot!");
+        return;
+    }
 
-  const svg = d3.select("#chart-commits")
-    .append("svg")
-    .attr("width", width)
-    .attr("height", height);
+    d3.select("#chart").selectAll("svg").remove(); // Remove previous chart
 
-  // Scales
-  const x = d3.scaleTime()
-    .domain(d3.extent(commits, d => d.datetime))
-    .range([margin, width - margin]);
+    const width = 1000, height = 600;
+    const margin = { top: 20, right: 30, bottom: 40, left: 50 };
 
-  const y = d3.scaleLinear()
-    .domain([0, 24])
-    .range([height - margin, margin]);
+    const svg = d3.select("#chart")
+        .append("svg")
+        .attr("viewBox", `0 0 ${width} ${height}`)
+        .style("overflow", "visible");
 
-  const r = d3.scaleSqrt()
-    .domain(d3.extent(commits, d => d.totalLines))
-    .range([3, 20]);
+    // Define Scales
+    const xScale = d3.scaleTime()
+        .domain(d3.extent(data, d => d.datetime))
+        .range([margin.left, width - margin.right]);
 
-  // Axes
-  const xAxis = d3.axisBottom(x).ticks(5);
-  const yAxis = d3.axisLeft(y).ticks(6).tickFormat(d => `${d}:00`);
+    const yScale = d3.scaleLinear()
+        .domain([0, 24])
+        .range([height - margin.bottom, margin.top]);
 
-  svg.append("g")
-    .attr("transform", `translate(0, ${height - margin})`)
-    .call(xAxis);
+    const rScale = d3.scaleSqrt()
+        .domain(d3.extent(data, d => d.line))
+        .range([3, 25]);
 
-  svg.append("g")
-    .attr("transform", `translate(${margin}, 0)`)
-    .call(yAxis);
+    // Add Grid Lines
+    const xAxisGrid = d3.axisBottom(xScale)
+        .tickSize(-height + margin.top + margin.bottom)
+        .tickFormat("")
+        .ticks(10);
 
-  // Plot circles
-  svg.selectAll("circle")
-    .data(commits)
-    .join("circle")
-    .attr("cx", d => x(d.datetime))
-    .attr("cy", d => y(d.hour))
-    .attr("r", d => r(d.totalLines))
-    .attr("fill", "steelblue")
-    .attr("fill-opacity", 0.7)
-    .on("mouseover", (event, d) => {
-      d3.select(event.currentTarget).attr("fill", "orange");
-    })
-    .on("mouseout", (event, d) => {
-      d3.select(event.currentTarget).attr("fill", "steelblue");
+    const yAxisGrid = d3.axisLeft(yScale)
+        .tickSize(-width + margin.left + margin.right)
+        .tickFormat("")
+        .ticks(10);
+
+    svg.append("g")
+        .attr("class", "grid")
+        .attr("transform", `translate(0, ${height - margin.bottom})`)
+        .call(xAxisGrid)
+        .selectAll("line")
+        .style("stroke", "#ddd")
+        .style("stroke-opacity", 0.5)
+        .style("stroke-width", 0.7);
+
+    svg.append("g")
+        .attr("class", "grid")
+        .attr("transform", `translate(${margin.left}, 0)`)
+        .call(yAxisGrid)
+        .selectAll("line")
+        .style("stroke", "#ddd")
+        .style("stroke-opacity", 0.5)
+        .style("stroke-width", 0.7);
+
+    // Add Axes
+    svg.append("g")
+       .attr("transform", `translate(0, ${height - margin.bottom})`)
+       .call(d3.axisBottom(xScale).tickFormat(d3.timeFormat("%a %d")));
+
+    svg.append("g")
+       .attr("transform", `translate(${margin.left}, 0)`)
+       .call(d3.axisLeft(yScale).tickFormat(d => `${d}:00`));
+
+    console.log("✅ Axes Added");
+
+    // Plot Circles
+    const dots = svg.append("g").attr("class", "dots");
+    dots.selectAll("circle")
+        .data(data)
+        .join("circle")
+        .attr("cx", d => xScale(d.datetime))
+        .attr("cy", d => yScale(d.hour))
+        .attr("r", d => rScale(d.line))
+        .attr("fill", "steelblue")
+        .attr("fill-opacity", 0.7);
+
+    console.log("✅ Scatter Plot Created");
+
+    // Add Brushing with Highlight
+    const brush = d3.brush()
+        .on("start brush end", (event) => {
+            if (!event.selection) {
+                dots.selectAll("circle")
+                    .attr("fill", "steelblue")
+                    .attr("fill-opacity", 0.7);
+                updateSummary([]);
+                return;
+            }
+
+            const [[x0, y0], [x1, y1]] = event.selection;
+
+            const selectedData = data.filter(d => {
+                const cx = xScale(d.datetime);
+                const cy = yScale(d.hour);
+                return (cx >= x0 && cx <= x1 && cy >= y0 && cy <= y1);
+            });
+
+            dots.selectAll("circle")
+                .attr("fill", d => selectedData.includes(d) ? "red" : "steelblue")
+                .attr("fill-opacity", d => selectedData.includes(d) ? 1 : 0.2);
+
+            updateSummary(selectedData);
+        });
+
+    svg.append("g").call(brush);
+    dots.raise();
+}
+
+function updateSummary(selectedData) {
+    d3.select("#selected-summary").remove();
+
+    const summary = d3.select("#chart")
+        .append("div")
+        .attr("id", "selected-summary")
+        .style("margin-top", "20px")
+        .style("text-align", "center");
+
+    // If no commits are selected
+    if (selectedData.length === 0) {
+        summary.append("p").text("No commits selected").style("font-style", "italic");
+        return;
+    }
+
+    const totalSelected = selectedData.length;
+    const typeCounts = d3.rollups(
+      selectedData,
+      v => d3.sum(v, d => d.line),
+      d => d.type
+    );
+    const totalLines = d3.sum(selectedData, d => d.line);
+
+    summary.append("p").text(`${totalSelected} commits selected`);
+
+    // Quick table layout
+    const table = summary.append("div")
+        .attr("class", "summary-table")
+        .style("display", "flex")
+        .style("justify-content", "center")
+        .style("gap", "50px")
+        .style("margin-top", "10px");
+
+    typeCounts.forEach(([type, lines]) => {
+        const percentage = ((lines / totalLines) * 100).toFixed(1);
+
+        const column = table.append("div")
+            .attr("class", "summary-column")
+            .style("text-align", "center")
+            .style("font-family", "monospace");
+
+        column.append("p").html(`<strong>${type.toUpperCase()}</strong>`);
+        column.append("p").text(`${lines} lines`);
+        column.append("p").text(`(${percentage}%)`);
     });
 }
 
-// ===============================
-// 4. Commit Files "Race" (Unit Chart)
-// ===============================
+// ====================
+// 🚀 LAB 8 ADDITION: SCROLLYTELLING
+// ====================
+function initScrollytelling() {
+    scrollContainer = d3.select("#scroll-container");
+    spacer = d3.select("#spacer");
+    itemsContainer = d3.select("#items-container");
+
+    // We have as many items as commits
+    let numItems = commits.length;
+    let totalHeight = Math.max(0, (numItems - 1) * ITEM_HEIGHT);
+    spacer.style("height", totalHeight + "px");
+
+    // On scroll, figure out which chunk of commits to show
+    scrollContainer.on("scroll", () => {
+        const scrollTop = scrollContainer.property("scrollTop");
+        let startIndex = Math.floor(scrollTop / ITEM_HEIGHT);
+        startIndex = Math.max(0, Math.min(startIndex, numItems - VISIBLE_COUNT));
+        renderItems(startIndex);
+    });
+}
+
+// We'll create a narrative chunk for each commit
+function renderItems(startIndex) {
+    // Clear old items
+    itemsContainer.selectAll("div.scrolly-item").remove();
+
+    const endIndex = Math.min(startIndex + VISIBLE_COUNT, commits.length);
+    const slice = commits.slice(startIndex, endIndex);
+
+    // Create new items
+    itemsContainer.selectAll("div.scrolly-item")
+      .data(slice)
+      .join("div")
+      .attr("class", "scrolly-item")
+      .style("position", "absolute")
+      .style("top", (_, i) => `${i * ITEM_HEIGHT}px`)
+      .style("height", ITEM_HEIGHT + "px")
+      .style("padding", "0.5em")
+      .style("border-bottom", "1px solid #eee")
+      .html(d => {
+        const dt = d.datetime.toLocaleString();
+        return `
+          <p><strong>Commit:</strong> ${d.commit}</p>
+          <p>Date/Time: ${dt}</p>
+          <p>Lines edited: ${d.totalLines}</p>
+        `;
+      });
+
+    // If you want to filter your scatterplot or file chart to only these commits:
+    // let commitIds = new Set(slice.map(d => d.commit));
+    // updateScatterplotToSubset(commitIds);
+    // displayCommitFiles(slice);
+}
+
+// ====================
+// 🚀 LAB 8 ADDITION: FILE SIZE RACE (UNIT CHART)
+// ====================
 function displayCommitFiles(someCommits) {
-  // Flatten out the lines from all commits
-  let lines = someCommits.flatMap(d => d.lines);
-
-  // Group lines by file name
-  let files = d3.groups(lines, d => d.file)
-    .map(([name, lines]) => ({ name, lines }));
-
-  // Sort by number of lines descending
-  files = d3.sort(files, d => -d.lines.length);
-
-  // Clear existing
-  d3.select(".files").selectAll("div").remove();
-
-  // Re-bind
-  const fileDivs = d3.select(".files")
-    .selectAll("div")
-    .data(files)
-    .join("div");
-
-  // dt holds the filename and line count
-  fileDivs.append("dt")
-    .html(d => `<code>${d.name}</code> <small>${d.lines.length} lines</small>`);
-
-  // dd holds the “unit dots”
-  fileDivs.append("dd")
-    .selectAll("div.line")
-    .data(d => d.lines)
-    .join("div")
-    .attr("class", "line")
-    .style("background", d => fileTypeColor(d.type));
-}
-
-// ===============================
-// 5. Scrollytelling Setup (Commits)
-// ===============================
-function setupScrollytellingCommits() {
-  NUM_ITEMS_COMMITS = commits.length;
-  scrollContainerCommits = d3.select("#scroll-container-commits");
-  spacerCommits = d3.select("#spacer-commits");
-  itemsContainerCommits = d3.select("#items-container-commits");
-
-  // total scrolling height
-  const totalHeight = (NUM_ITEMS_COMMITS - 1) * ITEM_HEIGHT_COMMITS;
-  spacerCommits.style("height", totalHeight + "px");
-
-  scrollContainerCommits.on("scroll", () => {
-    const scrollTop = scrollContainerCommits.property("scrollTop");
-    let startIndex = Math.floor(scrollTop / ITEM_HEIGHT_COMMITS);
-    startIndex = Math.max(0, Math.min(startIndex, commits.length - VISIBLE_COUNT_COMMITS));
-    renderItemsCommits(startIndex);
-  });
-}
-
-function renderItemsCommits(startIndex) {
-  itemsContainerCommits.selectAll("div.item-commit").remove();
-
-  const endIndex = Math.min(startIndex + VISIBLE_COUNT_COMMITS, commits.length);
-  const slice = commits.slice(startIndex, endIndex);
-
-  // Re-draw scrolly text items
-  itemsContainerCommits.selectAll("div.item-commit")
-    .data(slice)
-    .join("div")
-    .attr("class", "item-commit")
-    .style("top", (_, i) => (i * ITEM_HEIGHT_COMMITS) + "px")
-    .html((d, i) => {
-      return `
-        <p><strong>Commit:</strong> ${d.commit}</p>
-        <p>${d.datetime.toLocaleString()}</p>
-        <p>Edited ${d.totalLines} lines</p>
-      `;
+    // Flatten lines from all commits
+    let allLines = [];
+    someCommits.forEach(c => {
+        // c.lines = array of { file, type, lineCount }
+        // We'll replicate each lineCount as that many lines or just treat lineCount as 1 each
+        // For a simpler approach, treat lineCount as if each is 1 line
+        // Or, if your data is 1 row = 1 line, just push them directly
+        // For demonstration, we’ll just push each entry once
+        // but you can get fancier if needed
+        allLines.push(...c.lines);
     });
 
-  // If you also want to filter your scatterplot or something else:
-  // updateScatterplot(slice);
+    // Group lines by file
+    let files = d3.groups(allLines, d => d.file)
+      .map(([file, lines]) => ({
+        file,
+        lines
+      }));
+    // Sort by number of lines descending
+    files.sort((a, b) => b.lines.length - a.lines.length);
 
-  // Or update your file chart to show only lines from these commits
-  // displayCommitFiles(slice);
+    // Clear existing
+    d3.select(".files").selectAll("div").remove();
+
+    // Re-bind
+    const fileDiv = d3.select(".files")
+      .selectAll("div")
+      .data(files)
+      .join("div");
+
+    // dt: show file name & line count
+    fileDiv.append("dt")
+      .html(d => `<code>${d.file}</code> <small>${d.lines.length} lines</small>`);
+
+    // dd: unit dots
+    fileDiv.append("dd")
+      .selectAll("div.line")
+      .data(d => d.lines)
+      .join("div")
+      .attr("class", "line") // styled in CSS
+      .style("background", d => {
+        // color by file type or something
+        // if your CSV has `d.type`, you can do an ordinal scale
+        if (d.type === "js") return "#ff7f0e";
+        if (d.type === "css") return "#1f77b4";
+        if (d.type === "html") return "#2ca02c";
+        return "gray";
+      });
 }
 
-// ===============================
-// 6. Scrollytelling Setup (Files)
-// ===============================
-function setupScrollytellingFiles() {
-  scrollContainerFiles = d3.select("#scroll-container-files");
-  spacerFiles = d3.select("#spacer-files");
-  itemsContainerFiles = d3.select("#items-container-files");
-
-  // for demonstration, let's imagine we just have 10 “file states”
-  NUM_ITEMS_FILES = 10;
-  const totalHeight = (NUM_ITEMS_FILES - 1) * ITEM_HEIGHT_FILES;
-  spacerFiles.style("height", totalHeight + "px");
-
-  scrollContainerFiles.on("scroll", () => {
-    const scrollTop = scrollContainerFiles.property("scrollTop");
-    let startIndex = Math.floor(scrollTop / ITEM_HEIGHT_FILES);
-    startIndex = Math.max(0, Math.min(startIndex, NUM_ITEMS_FILES - VISIBLE_COUNT_FILES));
-    renderItemsFiles(startIndex);
-  });
-}
-
-function renderItemsFiles(startIndex) {
-  itemsContainerFiles.selectAll("div.item-file").remove();
-
-  const endIndex = startIndex + VISIBLE_COUNT_FILES;
-  const slice = d3.range(startIndex, endIndex);
-
-  // For a real dataset, you'd map each slice index to a “state” of the code
-  // or to a time-based subset of commits. For the example, we just show placeholders.
-  itemsContainerFiles.selectAll("div.item-file")
-    .data(slice)
-    .join("div")
-    .attr("class", "item-file")
-    .style("top", (_, i) => (i * ITEM_HEIGHT_FILES) + "px")
-    .html((d, i) => {
-      return `<p>Section #${d}: This might correspond to some state or date range of the code.</p>`;
-    });
-
-  // If you want your file chart to update:
-  // displayCommitFiles(...some subset of commits here...);
-}
-
-// ===============================
-// 7. On DOM Load
-// ===============================
-document.addEventListener("DOMContentLoaded", loadData);
+// ====================
+// 🚀 DOMContentLoaded
+// ====================
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadData();
+    console.log("✅ D3 script loaded and visualizations created!");
+});
